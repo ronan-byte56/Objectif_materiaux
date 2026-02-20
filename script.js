@@ -308,32 +308,27 @@ premiere: [
   ]
 };
 // ==========================================
-// 3. FONCTIONS DE NAVIGATION
+// 3. FONCTIONS
 // ==========================================
 
 function choisirNiveau(niveau) {
     niveauActuel = niveau;
-    
-    // Filtrer les questions non réussies
     let dispos = questions[niveau].filter(q => !questionsReussies.includes(q.q));
 
     if (dispos.length === 0) {
-        if (confirm("Bravo ! Tu as tout réussi. Recommencer ce niveau ?")) {
+        if (confirm("Niveau terminé ! Recommencer ?")) {
             questionsReussies = questionsReussies.filter(qText => !questions[niveau].some(q => q.q === qText));
             localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
             dispos = questions[niveau];
-        } else { return; }
+        } else return;
     }
 
-    // Mélanger et prendre 20 questions
     dispos.sort(() => Math.random() - 0.5);
     questionsAffichees = dispos.slice(0, 20);
-    
     indexQuestion = 0;
     score = 0;
     timerGlobal = 0;
 
-    // Masquer le menu et afficher le jeu
     document.getElementById("selection-niveau").style.display = "none";
     document.getElementById("jeu").style.display = "block";
 
@@ -351,84 +346,58 @@ function afficherQuestion() {
 
 function verifierReponse() {
     const input = document.getElementById("input-reponse");
-    const saisie = input.value.toLowerCase().trim();
-    const qCourante = questionsAffichees[indexQuestion];
     const feedback = document.getElementById("feedback-message");
+    const saisie = input.value.toLowerCase().trim();
+    const q = questionsAffichees[indexQuestion];
 
-    // Normalisation (enlever les accents)
-    const norm = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    const saisieNorm = norm(saisie);
+    const estCorrect = q.a.some(mot => saisie.includes(mot.toLowerCase()));
 
-    const estCorrect = qCourante.a.some(mot => norm(mot).includes(saisieNorm) || saisieNorm.includes(norm(mot)));
-
-    if (estCorrect && saisieNorm.length >= 2) {
+    if (estCorrect && saisie.length > 1) {
         score++;
-        if (!questionsReussies.includes(qCourante.q)) {
-            questionsReussies.push(qCourante.q);
+        if (!questionsReussies.includes(q.q)) {
+            questionsReussies.push(q.q);
             localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
         }
-        feedback.innerHTML = "✅ CORRECT !<br><small>" + qCourante.r + "</small>";
+        feedback.innerHTML = "✅ CORRECT !<br><small>" + q.r + "</small>";
         feedback.style.backgroundColor = "#27ae60";
     } else {
-        feedback.innerHTML = "❌ OUPS...<br><small>Réponse : " + qCourante.r + "</small>";
+        feedback.innerHTML = "❌ OUPS...<br><small>La réponse était : " + q.r + "</small>";
         feedback.style.backgroundColor = "#e74c3c";
     }
 
     feedback.style.display = "block";
-
     setTimeout(() => {
         feedback.style.display = "none";
-        prochaineQuestion();
+        indexQuestion++;
+        if (indexQuestion < questionsAffichees.length) afficherQuestion();
+        else terminerQuiz();
     }, 2500);
-}
-
-function prochaineQuestion() {
-    indexQuestion++;
-    if (indexQuestion < questionsAffichees.length) {
-        afficherQuestion();
-    } else {
-        terminerQuiz();
-    }
 }
 
 function lancerTimer() {
     if (intervalTimer) clearInterval(intervalTimer);
     intervalTimer = setInterval(() => {
         timerGlobal++;
-        const m = Math.floor(timerGlobal / 60);
-        const s = timerGlobal % 60;
-        document.getElementById("timer").innerText = `Temps : ${m}m ${s < 10 ? "0"+s : s}s`;
+        document.getElementById("timer").innerText = `Temps : ${timerGlobal}s`;
     }, 1000);
 }
 
 function terminerQuiz() {
     clearInterval(intervalTimer);
-    document.getElementById("jeu").innerHTML = `
-        <div style="padding: 20px; text-align:center;">
-            <h2>🏆 Session terminée !</h2>
-            <p>Score : ${score} / ${questionsAffichees.length}</p>
-            <button class="btn-niveau" onclick="location.reload()">Retour au menu</button>
-        </div>
-    `;
+    document.getElementById("jeu").innerHTML = `<h2>🏆 Fini ! Score : ${score}/${questionsAffichees.length}</h2><button onclick="location.reload()">Retour</button>`;
 }
 
-// ==========================================
-// 4. INITIALISATION (MODAL & BOUTONS)
-// ==========================================
-
 window.onload = function() {
-    // Affichage du modal si pas déjà vu
     if (!localStorage.getItem('guide_vu')) {
         document.getElementById('welcome-modal').style.display = "flex";
     }
 };
 
 function fermerModal() {
-    if (document.getElementById('nePlusAfficher').checked) {
-        localStorage.setItem('guide_vu', 'true');
-    }
+    if (document.getElementById('nePlusAfficher').checked) localStorage.setItem('guide_vu', 'true');
     document.getElementById('welcome-modal').style.display = "none";
 }
+
 
 
 
