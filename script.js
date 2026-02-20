@@ -422,7 +422,7 @@ function terminerQuiz() {
             <p>Temps total : ${tempsFinal}</p>
             <hr>
             <p>Note tes résultats et clique ci-dessous pour les transmettre :</p>
-            <button class="btn-niveau" onclick="window.open('TON_LIEN_GOOGLE_FORM')">
+            <button class="btn-niveau" onclick="window.open('https://forms.gle/m3MUyvHDC1Qh2a4HA')">
                 Envoyer mes résultats
             </button>
             <br><br>
@@ -433,5 +433,6 @@ function terminerQuiz() {
     `;
 }
 });
+
 
 
