@@ -302,42 +302,89 @@ premiere: [
         { q: "HSE : Qu'est-ce qu'un accident du travail ?", a: ["blesse", "pendant", "travail", "accident"], r: "Un accident survenu par le fait ou à l'occasion du travail." },
         { q: "ENVIRONNEMENT : Pourquoi séparer les déchets composites des métaux ?", a: ["tri", "recyclage", "separation", "filiere"], r: "Parce qu'ils suivent des filières de traitement totalement différentes." },
         { q: "HSE : Que signifie le marquage CE ?", a: ["norme europeenne", "europe", "conforme", "securite"], r: "Le produit respecte les normes de sécurité européennes." }
-    ]
+  ]
 };
 
 // ==========================================
-// INITIALISATION & REPRISE
+// FONCTIONS DE NAVIGATION
 // ==========================================
-
-// MODIF : Pour afficher le modal correctement au chargement
-window.onload = function() {
-    // Vérifie si l'élève a déjà dit "C'est bon, j'ai compris"
-    const dejaVu = localStorage.getItem('guide_vu');
-    const modal = document.getElementById("welcome-modal");
+function choisirNiveau(niveau) {
+    niveauActuel = niveau;
+    questionsAffichees = [...questions[niveau]];
+    // Mélange des questions
+    questionsAffichees.sort(() => Math.random() - 0.5);
     
-    if (!dejaVu) {
-        modal.style.display = "flex"; // On utilise flex pour le centrage
-    }
-
-   // Si une sauvegarde existe, on la charge automatiquement sans poser de question
-if (localStorage.getItem('quiz_index')) {
-    chargerPartie();
+    document.getElementById('menu-niveaux').style.display = 'none';
+    document.getElementById('quiz-container').style.display = 'block';
+    
+    indexQuestion = 0;
+    score = 0;
+    timerGlobal = 0;
+    demarrerTimer();
+    afficherQuestion();
 }
+
+function afficherQuestion() {
+    if (indexQuestion < 20 && indexQuestion < questionsAffichees.length) {
+        const q = questionsAffichees[indexQuestion];
+        document.getElementById('question-text').innerText = q.q;
+        document.getElementById('reponse-input').value = "";
+        document.getElementById('reponse-input').focus();
+        document.getElementById('num-question').innerText = (indexQuestion + 1);
+    } else {
+        terminerQuiz();
+    }
+}
+
+function validerReponse() {
+    const saisie = document.getElementById('reponse-input').value.toLowerCase().trim();
+    const q = questionsAffichees[indexQuestion];
+    
+    // Vérification simple par mots-clés
+    let correct = q.a.some(mot => saisie.includes(mot));
+    
+    if (correct) {
+        score++;
+        alert("Bravo ! \n\nRéponse complète : " + q.r);
+    } else {
+        alert("Dommage ! \n\nLa bonne réponse était : " + q.r);
+    }
+    
+    indexQuestion++;
+    afficherQuestion();
+}
+
+function demarrerTimer() {
+    intervalTimer = setInterval(() => {
+        timerGlobal++;
+        let min = Math.floor(timerGlobal / 60);
+        let sec = timerGlobal % 60;
+        document.getElementById('timer').innerText = min + "m " + sec + "s";
+    }, 1000);
+}
+
+function terminerQuiz() {
+    clearInterval(intervalTimer);
+    alert("Quiz terminé ! Score : " + score + "/20");
+    location.reload(); 
+}
+
+// Initialisation au chargement
+window.onload = function() {
+    const dejavu = localStorage.getItem('guide_vu');
+    const modal = document.getElementById('welcome-modal');
+    if (!dejavu) {
+        modal.style.display = "flex";
+    }
 };
 
-// Fonction pour fermer et mémoriser le choix
 function fermerModal() {
-    const caseCochee = document.getElementById("ne-plus-montrer").checked;
-    if (caseCochee) {
+    const checkbox = document.getElementById('nePlusAfficher');
+    if (checkbox.checked) {
         localStorage.setItem('guide_vu', 'true');
     }
-    document.getElementById("welcome-modal").style.display = "none";
+    document.getElementById('welcome-modal').style.display = "none";
 }
-document.addEventListener("keypress", function(e) {
-    if (e.key === "Enter" && document.getElementById("jeu").style.display === "block") {
-        verifierReponse();
-    }
-});
 
 // ==========================================
 // MÉCANIQUE DU JEU
@@ -498,6 +545,7 @@ function terminerQuiz() {
     `;
 
 }
+
 
 
 
