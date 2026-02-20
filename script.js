@@ -1,5 +1,5 @@
-/ ==========================================
-// BASE DE DONNÉES & ÉTAT
+// ==========================================
+// 1. ÉTAT DU JEU
 // ==========================================
 let questionsReussies = JSON.parse(localStorage.getItem('quiz_reussies')) || [];
 let questionsAffichees = [];
@@ -9,6 +9,9 @@ let score = 0;
 let timerGlobal = 0;
 let intervalTimer;
 
+// ==========================================
+// 2. BASE DE DONNÉES
+// ==========================================
 const questions = {
        seconde: [
         // --- SÉCURITÉ & HSE ---
@@ -304,49 +307,36 @@ premiere: [
         { q: "HSE : Que signifie le marquage CE ?", a: ["norme europeenne", "europe", "conforme", "securite"], r: "Le produit respecte les normes de sécurité européennes." }
   ]
 };
-
-] // Fin du tableau terminale
-}; // Fin de l'objet questions
-
 // ==========================================
-// MÉCANIQUE DU JEU & LOGIQUE
+// 3. FONCTIONS DE NAVIGATION
 // ==========================================
 
 function choisirNiveau(niveau) {
     niveauActuel = niveau;
     
-    // 1. Filtre les questions non encore réussies pour ce niveau
-    let questionsDisponibles = questions[niveauActuel].filter(q => !questionsReussies.includes(q.q));
+    // Filtrer les questions non réussies
+    let dispos = questions[niveau].filter(q => !questionsReussies.includes(q.q));
 
-    // 2. Si tout est réussi, on propose de recommencer
-    if (questionsDisponibles.length === 0) {
-        if (confirm("Félicitations ! Tu as validé toutes les questions de ce niveau. Recommencer ?")) {
-            // On retire les questions de ce niveau de la liste des réussites
-            questionsReussies = questionsReussies.filter(qText => !questions[niveauActuel].some(q => q.q === qText));
+    if (dispos.length === 0) {
+        if (confirm("Bravo ! Tu as tout réussi. Recommencer ce niveau ?")) {
+            questionsReussies = questionsReussies.filter(qText => !questions[niveau].some(q => q.q === qText));
             localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
-            questionsDisponibles = questions[niveauActuel];
-        } else {
-            return; 
-        }
+            dispos = questions[niveau];
+        } else { return; }
     }
 
-    // 3. Mélange aléatoire (Fisher-Yates)
-    for (let i = questionsDisponibles.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [questionsDisponibles[i], questionsDisponibles[j]] = [questionsDisponibles[j], questionsDisponibles[i]];
-    }
-
-    // 4. On prend 20 questions maximum pour la session
-    questionsAffichees = questionsDisponibles.slice(0, 20); 
+    // Mélanger et prendre 20 questions
+    dispos.sort(() => Math.random() - 0.5);
+    questionsAffichees = dispos.slice(0, 20);
     
     indexQuestion = 0;
-    score = 0; 
+    score = 0;
     timerGlobal = 0;
-    
-    // 5. Mise à jour de l'interface
+
+    // Masquer le menu et afficher le jeu
     document.getElementById("selection-niveau").style.display = "none";
     document.getElementById("jeu").style.display = "block";
-    
+
     lancerTimer();
     afficherQuestion();
 }
@@ -362,23 +352,18 @@ function afficherQuestion() {
 function verifierReponse() {
     const input = document.getElementById("input-reponse");
     const saisie = input.value.toLowerCase().trim();
-    const qCourante = questionsAffichees[indexQuestion]; 
+    const qCourante = questionsAffichees[indexQuestion];
     const feedback = document.getElementById("feedback-message");
 
-    // Normalisation pour ignorer les accents (ex: "étuve" devient "etuve")
-    const normaliser = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    const saisieNorm = normaliser(saisie);
+    // Normalisation (enlever les accents)
+    const norm = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const saisieNorm = norm(saisie);
 
-    // Vérification si l'un des mots-clés est présent dans la réponse
-    const estCorrect = qCourante.a.some(motCle => {
-        const motCleNorm = normaliser(motCle);
-        return saisieNorm.includes(motCleNorm);
-    });
+    const estCorrect = qCourante.a.some(mot => norm(mot).includes(saisieNorm) || saisieNorm.includes(norm(mot)));
 
     if (estCorrect && saisieNorm.length >= 2) {
         score++;
-        // Sauvegarde de la question réussie
-        if (!questionsReussies.includes(qCourante.q)) { 
+        if (!questionsReussies.includes(qCourante.q)) {
             questionsReussies.push(qCourante.q);
             localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
         }
@@ -391,16 +376,19 @@ function verifierReponse() {
 
     feedback.style.display = "block";
 
-    // Pause de 2.5s pour lire la correction puis question suivante
     setTimeout(() => {
         feedback.style.display = "none";
-        indexQuestion++;
-        if (indexQuestion < questionsAffichees.length) {
-            afficherQuestion();
-        } else {
-            terminerQuiz();
-        }
+        prochaineQuestion();
     }, 2500);
+}
+
+function prochaineQuestion() {
+    indexQuestion++;
+    if (indexQuestion < questionsAffichees.length) {
+        afficherQuestion();
+    } else {
+        terminerQuiz();
+    }
 }
 
 function lancerTimer() {
@@ -409,46 +397,39 @@ function lancerTimer() {
         timerGlobal++;
         const m = Math.floor(timerGlobal / 60);
         const s = timerGlobal % 60;
-        document.getElementById("timer").innerText = `Temps : ${m}m ${s < 10 ? "0" + s : s}s`;
+        document.getElementById("timer").innerText = `Temps : ${m}m ${s < 10 ? "0"+s : s}s`;
     }, 1000);
 }
 
 function terminerQuiz() {
     clearInterval(intervalTimer);
-    const m = Math.floor(timerGlobal / 60);
-    const s = timerGlobal % 60;
-
     document.getElementById("jeu").innerHTML = `
         <div style="padding: 20px; text-align:center;">
             <h2>🏆 Session terminée !</h2>
-            <p style="font-size: 1.4em;">Score : <span style="color: #27ae60;">${score} / ${questionsAffichees.length}</span></p>
-            <p>Temps : ${m}m ${s < 10 ? "0"+s : s}s</p>
-            <hr>
-            <button class="btn-niveau" onclick="window.open('https://forms.gle/6LK9Z9YFW3p9jzz87')">Envoyer mes résultats</button>
-            <br><br>
-            <button onclick="location.reload()" style="background:none; border:1px solid #ccc; padding:10px; border-radius:5px; cursor:pointer;">Retour au menu</button>
+            <p>Score : ${score} / ${questionsAffichees.length}</p>
+            <button class="btn-niveau" onclick="location.reload()">Retour au menu</button>
         </div>
     `;
 }
 
 // ==========================================
-// INITIALISATION & MODAL
+// 4. INITIALISATION (MODAL & BOUTONS)
 // ==========================================
 
 window.onload = function() {
-    const modal = document.getElementById('welcome-modal');
+    // Affichage du modal si pas déjà vu
     if (!localStorage.getItem('guide_vu')) {
-        modal.style.display = "flex";
+        document.getElementById('welcome-modal').style.display = "flex";
     }
 };
 
 function fermerModal() {
-    const checkbox = document.getElementById('nePlusAfficher');
-    if (checkbox.checked) {
+    if (document.getElementById('nePlusAfficher').checked) {
         localStorage.setItem('guide_vu', 'true');
     }
     document.getElementById('welcome-modal').style.display = "none";
 }
+
 
 
 
