@@ -459,16 +459,21 @@ function terminerQuiz() {
 }
 
 // ==========================================
-// 4. INITIALISATION (MODAL DE BIENVENUE & REPRISE)
+// 4. INITIALISATION (LANCEMENT AUTO SI SESSION)
 // ==========================================
 
 window.onload = function() {
-    // 1. On vérifie d'abord si le guide doit s'afficher
+    // ÉTAPE 1 : On regarde direct s'il y a une session
+    const sauvegarde = JSON.parse(localStorage.getItem('quiz_encours'));
+
+    // ÉTAPE 2 : Si une session existe, on zappe le menu et on lance le jeu
+    if (sauvegarde && sauvegarde.niveau) {
+        choisirNiveau(sauvegarde.niveau); 
+    } 
+
+    // ÉTAPE 3 : On gère l'affichage du popup par-dessus (si pas encore coché)
     if (!localStorage.getItem('guide_vu')) {
         document.getElementById('welcome-modal').style.display = "flex";
-    } else {
-        // 2. Si le guide est déjà masqué, on vérifie s'il y a une session à reprendre
-        verifierRepriseAutomatique();
     }
 };
 
@@ -478,17 +483,10 @@ function fermerModal() {
     }
     document.getElementById('welcome-modal').style.display = "none";
     
-    // 3. Après avoir fermé le modal, on vérifie aussi la reprise
-    verifierRepriseAutomatique();
+    // Une fois le modal fermé, si le jeu n'est pas déjà lancé, 
+    // l'élève verra le menu normalement.
 }
 
-function verifierRepriseAutomatique() {
-    const sauvegarde = JSON.parse(localStorage.getItem('quiz_encours'));
-    // Si une session existe, on lance le niveau correspondant directement
-    if (sauvegarde && sauvegarde.niveau) {
-        choisirNiveau(sauvegarde.niveau);
-    }
-}
 // ==========================================
 // 5. GESTION DES ÉVÉNEMENTS CLAVIER
 // ==========================================
@@ -498,6 +496,7 @@ document.addEventListener('keypress', (e) => {
         verifierReponse();
     }
 });
+
 
 
 
