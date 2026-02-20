@@ -307,94 +307,131 @@ premiere: [
   ]
 };
 // ==========================================
-// 3. LOGIQUE DU JEU
+// MÉCANIQUE DU JEU
 // ==========================================
 
-function choisirNiveau(niv) {
-    let dispos = questions[niv].filter(q => !questionsReussies.includes(q.q));
-    if (dispos.length === 0) {
-        if (confirm("Niveau fini ! Recommencer ?")) {
-            questionsReussies = [];
-            localStorage.setItem('quiz_reussies', "[]");
-            dispos = questions[niv];
-        } else return;
-    }
-    dispos.sort(() => Math.random() - 0.5);
-    questionsAffichees = dispos.slice(0, 20);
-    
+function choisirNiveau(niveau) {
+    niveauActuel = niveau;
+    indexQuestion = 0;
+    score = 0;
+    timerGlobal = 0;
+
     document.getElementById("selection-niveau").style.display = "none";
     document.getElementById("jeu").style.display = "block";
+    
     lancerTimer();
     afficherQuestion();
 }
 
-function afficherQuestion() {
-    const q = questionsAffichees[indexQuestion];
-    document.getElementById("question").innerText = q.q;
-    document.getElementById("input-reponse").value = "";
-    document.getElementById("progression").innerText = `Question ${indexQuestion + 1} / ${questionsAffichees.length}`;
-    document.getElementById("input-reponse").focus();
-}
-
-function verifierReponse() {
-    const input = document.getElementById("input-reponse");
-    const feedback = document.getElementById("feedback-message");
-    const saisie = input.value.toLowerCase().trim();
-    const q = questionsAffichees[indexQuestion];
-
-    const norm = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    const estOk = q.a.some(m => norm(saisie).includes(norm(m)) || norm(m).includes(norm(saisie)));
-
-    if (estOk && saisie.length > 1) {
-        score++;
-        if (!questionsReussies.includes(q.q)) {
-            questionsReussies.push(q.q);
-            localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
-        }
-        feedback.className = "feedback correct";
-        feedback.innerHTML = "✅ BIEN JOUÉ !<br><small>" + q.r + "</small>";
-    } else {
-        feedback.className = "feedback erreur";
-        feedback.innerHTML = "❌ PAS TOUT À FAIT...<br><small>Réponse : " + q.r + "</small>";
-    }
-
-    feedback.style.display = "block";
-    setTimeout(() => {
-        feedback.style.display = "none";
-        indexQuestion++;
-        if (indexQuestion < questionsAffichees.length) afficherQuestion();
-        else terminer();
-    }, 2800);
-}
-
 function lancerTimer() {
+    // On réinitialise l'intervalle s'il existait déjà
+    if (intervalTimer) clearInterval(intervalTimer);
+    
     intervalTimer = setInterval(() => {
         timerGlobal++;
-        let m = Math.floor(timerGlobal/60);
-        let s = timerGlobal%60;
-        document.getElementById("timer").innerText = `Temps : ${m}m ${s < 10 ? '0'+s : s}s`;
+        const m = Math.floor(timerGlobal / 60);
+        const s = timerGlobal % 60;
+        // On ajoute un '0' devant les secondes si < 10
+        const secondesAffichees = s < 10 ? "0" + s : s;
+        document.getElementById("timer").innerText = `Temps : ${m}m ${secondesAffichees}s`;
     }, 1000);
 }
 
-function terminer() {
-    clearInterval(intervalTimer);
-    document.getElementById("jeu").innerHTML = `<div class="card"><h2>🏆 Terminé ! Score : ${score}/${questionsAffichees.length}</h2><button class="btn-lvl" onclick="location.reload()">Retour</button></div>`;
+function afficherQuestion() {
+    const q = questions[niveauActuel][indexQuestion];
+    document.getElementById("question").innerText = q.q;
+    document.getElementById("input-reponse").value = "";
+    document.getElementById("progression").innerText = `Question ${indexQuestion + 1} / ${questions[niveauActuel].length}`;
+    
+    // Focus sur l'input pour que le clavier s'ouvre vite (sur certains mobiles)
+    document.getElementById("input-reponse").focus();
+    
+    sauvegarderPartie();
 }
 
-// GESTION MODAL
-window.onload = () => {
-    if (!localStorage.getItem('guide_vu')) document.getElementById('welcome-modal').style.display = "flex";
-};
+function verifierReponse() {
+    const saisie = document.getElementById("input-reponse").value.toLowerCase().trim();
+    const q = questions[niveauActuel][indexQuestion];
 
-function fermerModal() {
-    if (document.getElementById('nePlusAfficher').checked) localStorage.setItem('guide_vu', 'true');
-    document.getElementById('welcome-modal').style.display = "none";
-}
+    // Fonction pour enlever les accents et faciliter la correction
+    const normaliser = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
-// --- AJOUT : VALIDATION AVEC LA TOUCHE ENTREE ---
-document.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' && document.getElementById('jeu').style.display !== 'none') {
-        verifierReponse();
+    const estCorrect = q.a.some(motCle => normaliser(saisie).includes(normaliser(motCle)));
+
+    if (estCorrect) {
+        score++;
+        alert("✅ CORRECT !\n" + q.r);
+    } else {
+        alert("❌ DOMMAGE...\nLa réponse attendue était : " + q.r);
     }
+
+    prochaineQuestion();
+}
+
+function prochaineQuestion() {
+    indexQuestion++;
+    if (indexQuestion < questions[niveauActuel].length) {
+        afficherQuestion();
+    } else {
+        terminerQuiz();
+    }
+}
+
+// ==========================================
+// SAUVEGARDE (Local Storage)
+// ==========================================
+
+function sauvegarderPartie() {
+    localStorage.setItem('quiz_niveau', niveauActuel);
+    localStorage.setItem('quiz_index', indexQuestion);
+    localStorage.setItem('quiz_score', score);
+    localStorage.setItem('quiz_timer', timerGlobal);
+}
+
+function chargerPartie() {
+    niveauActuel = localStorage.getItem('quiz_niveau');
+    indexQuestion = parseInt(localStorage.getItem('quiz_index'));
+    score = parseInt(localStorage.getItem('quiz_score'));
+    timerGlobal = parseInt(localStorage.getItem('quiz_timer'));
+
+    document.getElementById("selection-niveau").style.display = "none";
+    document.getElementById("jeu").style.display = "block";
+    
+    lancerTimer();
+    afficherQuestion();
+}
+
+// ==========================================
+// FIN DE SESSION
+// ==========================================
+
+function terminerQuiz() {
+    clearInterval(intervalTimer);
+    localStorage.clear(); // On vide la mémoire car le quiz est fini
+
+    const scoreFinal = `${score} / ${questions[niveauActuel].length}`;
+    const m = Math.floor(timerGlobal / 60);
+    const s = timerGlobal % 60;
+    const tempsFinal = `${m}m ${s}s`;
+
+    document.getElementById("jeu").innerHTML = `
+        <div style="padding: 20px;">
+            <h2>🏆 Objectif Atteint !</h2>
+            <p>Tu as terminé le niveau <strong>${niveauActuel.toUpperCase()}</strong>.</p>
+            <p style="font-size: 1.4em;">Score : <span style="color: #27ae60;">${scoreFinal}</span></p>
+            <p>Temps total : ${tempsFinal}</p>
+            <hr>
+            <p>Note tes résultats et clique ci-dessous pour les transmettre :</p>
+            <button class="btn-niveau" onclick="window.open('TON_LIEN_GOOGLE_FORM')">
+                Envoyer mes résultats
+            </button>
+            <br><br>
+            <button onclick="location.reload()" style="background: none; border: 1px solid #ccc; padding: 10px; border-radius: 5px; cursor: pointer;">
+                Retour au menu
+            </button>
+        </div>
+    `;
+}
 });
+
 
