@@ -459,24 +459,23 @@ function terminerQuiz() {
 }
 
 // ==========================================
-// 4. INITIALISATION (FORÇAGE REPRISE SESSION)
+// 4. INITIALISATION
 // ==========================================
 
 window.onload = function() {
     const sauvegarde = JSON.parse(localStorage.getItem('quiz_encours'));
 
+    // Si une session existe, on la prépare
     if (sauvegarde && sauvegarde.niveau) {
-        // On lance le niveau en arrière-plan
         choisirNiveau(sauvegarde.niveau);
-        
-        // Si le guide n'est PAS affiché, on lance la notif de suite
-        if (localStorage.getItem('guide_vu')) {
-            afficherNotifReprise();
-        }
     }
 
+    // Gestion du Guide
     if (!localStorage.getItem('guide_vu')) {
         document.getElementById('welcome-modal').style.display = "flex";
+    } else {
+        // Si le guide n'est pas là, on peut afficher la notif de suite
+        if (sauvegarde) { afficherNotifReprise(); }
     }
 };
 
@@ -486,9 +485,8 @@ function fermerModal() {
     }
     document.getElementById('welcome-modal').style.display = "none";
     
-    // REPRISE : Si une session est en cours, on affiche la notif MAINTENANT
-    const sauvegarde = JSON.parse(localStorage.getItem('quiz_encours'));
-    if (sauvegarde) {
+    // Si on est en train de reprendre une partie, on lance la notif au moment où le guide part
+    if (localStorage.getItem('quiz_encours')) {
         afficherNotifReprise();
     }
 
@@ -498,17 +496,20 @@ function fermerModal() {
 }
 
 function afficherNotifReprise() {
-    // Sécurité pour éviter d'en afficher plusieurs
-    if (document.querySelector('.notif-reprise')) return;
+    // On vérifie si elle n'existe pas déjà pour éviter les doublons
+    if (document.getElementById('notif-temp')) return;
 
     const notif = document.createElement('div');
+    notif.id = 'notif-temp';
     notif.className = 'notif-reprise';
     notif.innerText = '🚀 Reprise de ta partie en cours !';
     document.body.appendChild(notif);
 
-    setTimeout(() => { notif.remove(); }, 3000);
+    // On la retire après 3 secondes
+    setTimeout(() => {
+        if (notif) notif.remove();
+    }, 3000);
 }
-
 // ==========================================
 // 5. GESTION DES ÉVÉNEMENTS CLAVIER
 // ==========================================
@@ -518,6 +519,7 @@ document.addEventListener('keypress', (e) => {
         verifierReponse();
     }
 });
+
 
 
 
