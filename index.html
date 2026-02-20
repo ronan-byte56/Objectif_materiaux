@@ -3,236 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OBJECTIF MATÉRIAUX</title>
-    <style>
-        body {
-            background-color: #0f172a;
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-
-        #app {
-            width: 90%;
-            max-width: 900px;
-            text-align: center;
-        }
-
-        h1 { font-size: 2.5rem; letter-spacing: 2px; margin: 0; text-transform: uppercase; }
-        .subtitle { color: #94a3b8; margin-bottom: 30px; font-size: 0.9rem; }
-
-        .class-nav {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .btn-class {
-            padding: 10px 30px;
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: transform 0.1s;
-        }
-        .btn-class:active { transform: scale(0.95); }
-        
-        .seconde { background-color: #059669; }
-        .premiere { background-color: #d97706; }
-        .terminale { background-color: #dc2626; }
-
-        .main-card {
-            background-color: #1e293b;
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-            min-height: 350px;
-            position: relative;
-        }
-
-        .question-box h2 {
-            font-size: 1.5rem;
-            margin-bottom: 30px;
-            min-height: 60px;
-        }
-
-        .options-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .option-item {
-            background-color: #334155;
-            border: 1px solid #475569;
-            padding: 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.2s;
-            font-size: 1.1rem;
-        }
-
-        .option-item:hover { background-color: #475569; border-color: #64748b; }
-        .option-item.correct { background-color: #059669 !important; border-color: #10b981; }
-        .option-item.wrong { background-color: #dc2626 !important; border-color: #ef4444; }
-
-        .hidden { display: none; }
-
-        #next-btn {
-            margin-top: 30px;
-            padding: 12px 40px;
-            background-color: #d97706;
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .result-screen { padding: 40px; }
-    </style>
+    <title>Quiz Plasturgie & Composites</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="app">
-    <h1>OBJECTIF MATÉRIAUX</h1>
-    <div class="subtitle" id="stats">Position : 0 / 0 | Score : 0 pts</div>
+    <div class="container">
+        <h1>Quiz Pro-Plast</h1>
 
-    <div class="class-nav" id="class-menu">
-        <button class="btn-class seconde" onclick="initLevel('seconde')">Seconde</button>
-        <button class="btn-class premiere" onclick="initLevel('premiere')">Première</button>
-        <button class="btn-class terminale" onclick="initLevel('terminale')">Terminale</button>
-    </div>
+        <div id="selection-niveau">
+            <p>Choisis ton niveau pour commencer :</p>
+            <button class="btn-niveau" onclick="choisirNiveau('seconde')">Seconde</button>
+            <button class="btn-niveau" onclick="choisirNiveau('premiere')">Première</button>
+            <button class="btn-niveau" onclick="choisirNiveau('terminale')">Terminale</button>
+        </div>
 
-    <div class="main-card">
-        <div id="welcome-msg">Choisissez votre classe pour commencer la session.</div>
-
-        <div id="quiz-content" class="hidden">
-            <div class="question-box">
-                <h2 id="q-text">Chargement...</h2>
-                <div id="options-container" class="options-list"></div>
+        <div id="jeu" style="display:none;">
+            <div class="stats-bar">
+                <span id="timer">Temps : 0m 0s</span>
+                <span id="progression">Question 1 / 100</span>
             </div>
-            <button id="next-btn" class="hidden" onclick="loadNextQuestion()">Question Suivante !</button>
-        </div>
-
-        <div id="final-screen" class="hidden result-screen">
-            <h2>Session Terminée !</h2>
-            <p id="final-score" style="font-size: 2rem;"></p>
-            <button class="btn-class premiere" onclick="location.reload()">Retour au Menu</button>
+            
+            <div class="card">
+                <p id="question"></p>
+                <input type="text" id="input-reponse" placeholder="Tape ta réponse..." autocomplete="off">
+                <button id="btn-valider" onclick="verifierReponse()">Valider</button>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    // --- LES VRAIES QUESTIONS TECHNIQUES ---
-    const questionsDB = {
-        seconde: [
-            { q: "Quel polymère est utilisé pour les bouteilles d'eau gazeuse (barrière gaz) ?", o: ["PET", "PEHD", "PS", "PVC"], a: 0 },
-            { q: "Le sigle PP signifie :", o: ["Polypropylène", "Polystyrène", "Polyphosphore"], a: 0 },
-            { q: "Quelle matière est d'origine naturelle ?", o: ["Le Bois", "Le PVC", "Le Polycarbonate"], a: 0 },
-            { q: "Un thermoplastique peut être :", o: ["Refondu plusieurs fois", "Cuit une seule fois", "Toujours liquide"], a: 0 },
-            { q: "Le PEHD flotte-t-il sur l'eau ?", o: ["Oui (densité < 1)", "Non (densité > 1)"], a: 0 }
-        ],
-        premiere: [
-            { q: "Que signifie le sigle MFI ?", o: ["Melt Flow Index", "Main Force Injection", "Matière Fine Injectée"], a: 0 },
-            { q: "Le retrait du Polypropylène est d'environ :", o: ["1.5 à 2%", "0.1%", "10%"], a: 0 },
-            { q: "Un agent nucléant sert à :", o: ["Accélérer la cristallisation", "Colorer", "Refroidir"], a: 0 },
-            { q: "Quelle est la T° de fusion du PEBD ?", o: ["110°C environ", "260°C environ", "50°C"], a: 0 }
-        ],
-        terminale: [
-            { q: "L'effet Diesel est dû à :", o: ["L'auto-inflammation de l'air comprimé", "Une fuite de gazole", "Une vis trop courte"], a: 0 },
-            { q: "Le temps de maintien sert à :", o: ["Compenser le retrait", "Chauffer le moule", "Doser la matière"], a: 0 },
-            { q: "Vitesse de cisaillement unité ?", o: ["s-1", "m/s", "Bar/s"], a: 0 },
-            { q: "La contre-pression agit pendant :", o: ["Le dosage", "L'injection", "L'éjection"], a: 0 }
-        ]
-    };
-
-    // Complément pour atteindre 300 questions (100 par niveau)
-    const levels = ['seconde', 'premiere', 'terminale'];
-    levels.forEach(lvl => {
-        let currentLen = questionsDB[lvl].length;
-        for (let i = currentLen; i < 100; i++) {
-            questionsDB[lvl].push({
-                q: `[Niveau ${lvl}] Question technique n°${i+1} : Analyse du comportement polymère ?`,
-                o: ["Paramètre Conforme", "Ajustement Nécessaire", "Défaut Critique", "Hors tolérance"],
-                a: 0
-            });
-        }
-    });
-
-    let activeSet = [];
-    let qIndex = 0;
-    let userScore = 0;
-
-    function initLevel(lvl) {
-        document.getElementById('welcome-msg').classList.add('hidden');
-        document.getElementById('quiz-content').classList.remove('hidden');
-        
-        activeSet = questionsDB[lvl].sort(() => Math.random() - 0.5).slice(0, 20); // Session de 20 questions
-        qIndex = 0;
-        userScore = 0;
-        showQuestion();
-    }
-
-    function showQuestion() {
-        const data = activeSet[qIndex];
-        document.getElementById('q-text').innerText = data.q;
-        document.getElementById('stats').innerText = `Position : ${qIndex + 1} / ${activeSet.length} | Score : ${userScore} pts`;
-        
-        const container = document.getElementById('options-container');
-        container.innerHTML = '';
-        document.getElementById('next-btn').classList.add('hidden');
-
-        data.o.forEach((opt, i) => {
-            const div = document.createElement('div');
-            div.className = 'option-item';
-            div.innerText = opt;
-            div.onclick = () => validateAnswer(i, div);
-            container.appendChild(div);
-        });
-    }
-
-    function validateAnswer(idx, element) {
-        const correctIdx = activeSet[qIndex].a;
-        const options = document.querySelectorAll('.option-item');
-        
-        // Bloquer les clics
-        options.forEach(opt => opt.style.pointerEvents = 'none');
-
-        if (idx === correctIdx) {
-            element.classList.add('correct');
-            userScore += 10;
-        } else {
-            element.classList.add('wrong');
-            options[correctIdx].classList.add('correct');
-        }
-
-        document.getElementById('next-btn').classList.remove('hidden');
-        document.getElementById('stats').innerText = `Position : ${qIndex + 1} / ${activeSet.length} | Score : ${userScore} pts`;
-    }
-
-    function loadNextQuestion() {
-        qIndex++;
-        if (qIndex < activeSet.length) {
-            showQuestion();
-        } else {
-            finishQuiz();
-        }
-    }
-
-    function finishQuiz() {
-        document.getElementById('quiz-content').classList.add('hidden');
-        document.getElementById('final-screen').classList.remove('hidden');
-        document.getElementById('final-score').innerText = `Score Final : ${userScore} points`;
-    }
-</script>
+    <script src="script.js"></script>
 </body>
 </html>
