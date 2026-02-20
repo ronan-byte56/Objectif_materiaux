@@ -10,8 +10,7 @@ let timerGlobal = 0;
 let intervalTimer;
 
 const questions = {
-    const questions = {
-    seconde: [
+       seconde: [
         // --- SÉCURITÉ & HSE ---
         { q: "SÉCURITÉ : Que signifie un pictogramme rouge avec une flamme ?", a: ["inflammable", "feu", "brule"], r: "Produit inflammable (ex: acétone, résine)." },
         { q: "SÉCURITÉ : Quel équipement protège les yeux contre les projections ?", a: ["lunettes", "visiere", "masque"], r: "Lunettes de sécurité." },
@@ -501,6 +500,7 @@ function terminerQuiz() {
     `;
 
 }
+
 
 
 
