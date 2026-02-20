@@ -496,19 +496,15 @@ function fermerModal() {
 }
 
 function afficherNotifReprise() {
-    // On vérifie si elle n'existe pas déjà pour éviter les doublons
-    if (document.getElementById('notif-temp')) return;
-
-    const notif = document.createElement('div');
-    notif.id = 'notif-temp';
-    notif.className = 'notif-reprise';
-    notif.innerText = '🚀 Reprise de ta partie en cours !';
-    document.body.appendChild(notif);
-
-    // On la retire après 3 secondes
-    setTimeout(() => {
-        if (notif) notif.remove();
-    }, 3000);
+    const notif = document.getElementById('notif-reprise');
+    if (notif) {
+        notif.style.display = 'block'; // On le montre
+        
+        // On le cache automatiquement après 3 secondes
+        setTimeout(() => {
+            notif.style.display = 'none';
+        }, 3000);
+    }
 }
 // ==========================================
 // 5. GESTION DES ÉVÉNEMENTS CLAVIER
@@ -519,6 +515,7 @@ document.addEventListener('keypress', (e) => {
         verifierReponse();
     }
 });
+
 
 
 
