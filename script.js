@@ -448,6 +448,7 @@ function verifierReponse() {
         indexQuestion++;
         if (indexQuestion < questionsAffichees.length) {
             afficherQuestion();
+        peutValider = true;       
         } else {
             terminerQuiz();
         }
@@ -551,6 +552,7 @@ document.addEventListener('keypress', (e) => {
         verifierReponse();
     }
 });
+
 
 
 
