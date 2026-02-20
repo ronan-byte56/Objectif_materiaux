@@ -186,7 +186,8 @@ premiere: [
         { q: "PLAN : Pourquoi le cartouche contient-il un indice de révision ?", a: ["modification", "version", "changement", "maj"], r: "Pour savoir si c'est la version la plus récente du plan." },
         { q: "PLAN : Que signifie 'Echelle 2:1' ?", a: ["agrandi", "double", "plus grand"], r: "Le dessin est deux fois plus grand que la réalité." },
         { q: "PLAN : Quel outil informatique utilise-t-on pour dessiner ?", a: ["cao", "dao", "ordinateur", "logiciel", "solidworks"], r: "La CAO (Conception Assistée par Ordinateur)." }
-    ],
+    ]
+],
     terminale: [
         // --- RHÉOLOGIE ET RÉGLAGE AVANCÉ ---
         { q: "RHÉOLOGIE : Qu'est-ce que la viscosité apparente ?", a: ["ecoulement", "vitesse", "epais", "fluide", "resistance"], r: "La résistance à l'écoulement sous une contrainte donnée." },
@@ -500,6 +501,7 @@ function terminerQuiz() {
     `;
 
 }
+
 
 
 
