@@ -146,4 +146,30 @@ h1 {
     line-height: 1.4;
     padding-left: 10px;
     border-left: 3px solid #27ae60;
+
+}
+
+/* Nouveau style pour les messages de correction */
+#feedback-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 30px;
+    border-radius: 20px;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2em;
+    z-index: 10000;
+    display: none; /* Caché par défaut */
+    text-align: center;
+    min-width: 280px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+    animation: bounceIn 0.5s ease;
+}
+
+@keyframes bounceIn {
+    0% { transform: translate(-50%, -50%) scale(0.7); opacity: 0; }
+    70% { transform: translate(-50%, -50%) scale(1.05); }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
