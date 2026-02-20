@@ -463,21 +463,33 @@ function terminerQuiz() {
 // ==========================================
 
 window.onload = function() {
-    // 1. On vérifie s'il y a une session en cours dans la mémoire
     const sauvegarde = JSON.parse(localStorage.getItem('quiz_encours'));
 
     if (sauvegarde && sauvegarde.niveau) {
-        // FORCE LA REPRISE : On appelle direct choisirNiveau avec le bon niveau
-        // Cela va masquer le menu et afficher le jeu instantanément
+        // Affiche le petit message de reprise
+        afficherNotifReprise();
+        
+        // Lance le niveau sauvegardé
         choisirNiveau(sauvegarde.niveau);
     }
 
-    // 2. On gère l'affichage du popup par-dessus
-    // S'il est là, il couvrira le jeu ou le menu jusqu'au clic
     if (!localStorage.getItem('guide_vu')) {
         document.getElementById('welcome-modal').style.display = "flex";
     }
 };
+
+function afficherNotifReprise() {
+    // On crée l'élément HTML dynamiquement
+    const notif = document.createElement('div');
+    notif.className = 'notif-reprise';
+    notif.innerText = 'Retours aux affaires... Reprise de la partie ! 🚀';
+    document.body.appendChild(notif);
+
+    // On le supprime du code après 3 secondes pour ne pas encombrer
+    setTimeout(() => {
+        notif.remove();
+    }, 3000);
+}
 
 function fermerModal() {
     if (document.getElementById('nePlusAfficher').checked) {
@@ -485,7 +497,6 @@ function fermerModal() {
     }
     document.getElementById('welcome-modal').style.display = "none";
     
-    // Au cas où le focus s'est perdu avec le popup
     if (document.getElementById('jeu').style.display !== 'none') {
         document.getElementById('input-reponse').focus();
     }
@@ -500,6 +511,7 @@ document.addEventListener('keypress', (e) => {
         verifierReponse();
     }
 });
+
 
 
 
