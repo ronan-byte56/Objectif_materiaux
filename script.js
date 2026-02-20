@@ -466,11 +466,13 @@ window.onload = function() {
     const sauvegarde = JSON.parse(localStorage.getItem('quiz_encours'));
 
     if (sauvegarde && sauvegarde.niveau) {
-        // Affiche le petit message de reprise
-        afficherNotifReprise();
-        
-        // Lance le niveau sauvegardé
+        // On lance le niveau en arrière-plan
         choisirNiveau(sauvegarde.niveau);
+        
+        // Si le guide n'est PAS affiché, on lance la notif de suite
+        if (localStorage.getItem('guide_vu')) {
+            afficherNotifReprise();
+        }
     }
 
     if (!localStorage.getItem('guide_vu')) {
@@ -478,28 +480,33 @@ window.onload = function() {
     }
 };
 
-function afficherNotifReprise() {
-    // On crée l'élément HTML dynamiquement
-    const notif = document.createElement('div');
-    notif.className = 'notif-reprise';
-    notif.innerText = 'Retours aux affaires... Reprise de la partie ! 🚀';
-    document.body.appendChild(notif);
-
-    // On le supprime du code après 3 secondes pour ne pas encombrer
-    setTimeout(() => {
-        notif.remove();
-    }, 3000);
-}
-
 function fermerModal() {
     if (document.getElementById('nePlusAfficher').checked) {
         localStorage.setItem('guide_vu', 'true');
     }
     document.getElementById('welcome-modal').style.display = "none";
     
+    // REPRISE : Si une session est en cours, on affiche la notif MAINTENANT
+    const sauvegarde = JSON.parse(localStorage.getItem('quiz_encours'));
+    if (sauvegarde) {
+        afficherNotifReprise();
+    }
+
     if (document.getElementById('jeu').style.display !== 'none') {
         document.getElementById('input-reponse').focus();
     }
+}
+
+function afficherNotifReprise() {
+    // Sécurité pour éviter d'en afficher plusieurs
+    if (document.querySelector('.notif-reprise')) return;
+
+    const notif = document.createElement('div');
+    notif.className = 'notif-reprise';
+    notif.innerText = '🚀 Reprise de ta partie en cours !';
+    document.body.appendChild(notif);
+
+    setTimeout(() => { notif.remove(); }, 3000);
 }
 
 // ==========================================
@@ -511,6 +518,7 @@ document.addEventListener('keypress', (e) => {
         verifierReponse();
     }
 });
+
 
 
 
