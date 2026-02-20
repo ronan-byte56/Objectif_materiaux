@@ -1,111 +1,88 @@
-:root {
-    --primary: #4f46e5;
-    --success: #10b981;
-    --bg: #f8fafc;
-    --text: #1f2937;
-    --card: #ffffff;
-}
-
 body {
-    font-family: 'Inter', -apple-system, sans-serif;
-    background-color: var(--bg);
+    font-family: Arial, sans-serif;
+    background-color: #f4f7f6;
     margin: 0;
     display: flex;
     justify-content: center;
-    color: var(--text);
-    -webkit-tap-highlight-color: transparent;
 }
 
 .container {
     width: 100%;
-    max-width: 450px;
+    max-width: 500px;
     padding: 20px;
+    text-align: center;
 }
 
 h1 {
-    font-size: 1.8rem;
-    text-align: center;
-    color: var(--primary);
-    margin-bottom: 30px;
+    color: #2c3e50;
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 10px;
 }
 
-/* Boutons de niveau */
-.btn-level-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
+/* Boutons de niveau (Ancien style) */
 .btn-niveau {
+    display: block;
+    width: 100%;
+    margin: 15px 0;
     padding: 20px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    background-color: var(--card);
-    color: var(--primary);
-    border: 2px solid var(--primary);
-    border-radius: 16px;
+    font-size: 1.2rem;
+    background-color: #3498db; /* Bleu industriel */
+    color: white;
+    border: none;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    box-shadow: 0 4px #2980b9;
 }
 
 .btn-niveau:active {
-    background-color: var(--primary);
-    color: white;
-    transform: scale(0.98);
+    transform: translateY(2px);
+    box-shadow: 0 2px #2980b9;
 }
 
-/* Zone de jeu */
+/* Barre de stats */
 .stats-bar {
     display: flex;
     justify-content: space-between;
-    padding: 12px 16px;
-    background: var(--primary);
-    color: white;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    font-size: 0.85rem;
-    font-weight: 500;
+    font-weight: bold;
+    margin-bottom: 15px;
+    background: #ecf0f1;
+    padding: 10px;
+    border-radius: 5px;
 }
 
+/* Carte de question */
 .card {
-    background: var(--card);
-    padding: 24px;
-    border-radius: 20px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 1px solid #ddd;
 }
 
 #question {
-    font-size: 1.2rem;
-    line-height: 1.5;
-    margin-bottom: 24px;
-    font-weight: 500;
-    text-align: left;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 20px;
 }
 
+/* Input spécial Mobile */
 #input-reponse {
     width: 100%;
-    padding: 16px;
-    font-size: 18px;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
+    padding: 15px;
+    font-size: 18px; /* Taille pour éviter le zoom forcé */
+    border: 2px solid #ccc;
+    border-radius: 5px;
     box-sizing: border-box;
-    margin-bottom: 16px;
-    transition: border-color 0.2s;
-}
-
-#input-reponse:focus {
-    border-color: var(--primary);
-    outline: none;
+    margin-bottom: 15px;
 }
 
 #btn-valider {
     width: 100%;
-    padding: 16px;
+    padding: 15px;
     font-size: 1.1rem;
-    font-weight: 600;
-    background-color: var(--success);
+    background-color: #27ae60; /* Vert validation */
     color: white;
     border: none;
-    border-radius: 12px;
+    border-radius: 5px;
     cursor: pointer;
 }
