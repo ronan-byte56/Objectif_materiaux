@@ -380,14 +380,10 @@ window.onload = function() {
         modal.style.display = "flex"; // On utilise flex pour le centrage
     }
 
-    // Gestion de la reprise de partie (ton code existant)
-    if (localStorage.getItem('quiz_index')) {
-        setTimeout(() => {
-            if (confirm("Tu as une partie en cours. Veux-tu la reprendre ?")) {
-                chargerPartie();
-            }
-        }, 600);
-    }
+   // Si une sauvegarde existe, on la charge automatiquement sans poser de question
+if (localStorage.getItem('quiz_index')) {
+    chargerPartie();
+}
 };
 
 // Fonction pour fermer et mémoriser le choix
@@ -560,3 +556,4 @@ function terminerQuiz() {
     `;
 
 }
+
