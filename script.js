@@ -312,6 +312,13 @@ premiere: [
 
 function choisirNiveau(niveau) {
     niveauActuel = niveau;
+    
+    // On mélange les questions du niveau choisi
+    melanger(questions[niveauActuel]);
+    
+    // Optionnel : si tu veux vraiment limiter la base à 20 pour cette session :
+    // questions[niveauActuel] = questions[niveauActuel].slice(0, 20);
+
     indexQuestion = 0;
     score = 0;
     timerGlobal = 0;
@@ -341,11 +348,11 @@ function afficherQuestion() {
     const q = questions[niveauActuel][indexQuestion];
     document.getElementById("question").innerText = q.q;
     document.getElementById("input-reponse").value = "";
-    document.getElementById("progression").innerText = `Question ${indexQuestion + 1} / ${questions[niveauActuel].length}`;
     
-    // Focus sur l'input pour que le clavier s'ouvre vite (sur certains mobiles)
+    // On affiche la progression sur 20 pour que ce soit plus motivant
+    document.getElementById("progression").innerText = `Question ${indexQuestion + 1} / 20`;
+    
     document.getElementById("input-reponse").focus();
-    
     sauvegarderPartie();
 }
 
@@ -370,11 +377,23 @@ function verifierReponse() {
 
 function prochaineQuestion() {
     indexQuestion++;
-    if (indexQuestion < questions[niveauActuel].length) {
+    
+    // On vérifie deux conditions pour continuer :
+    // 1. On n'a pas encore fait 20 questions
+    // 2. Il reste encore des questions dans la liste
+    if (indexQuestion < 20 && indexQuestion < questions[niveauActuel].length) {
         afficherQuestion();
     } else {
         terminerQuiz();
     }
+}
+
+function melanger(tableau) {
+    for (let i = tableau.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [tableau[i], tableau[j]] = [tableau[j], tableau[i]];
+    }
+    return tableau;
 }
 
 // ==========================================
@@ -433,6 +452,7 @@ function terminerQuiz() {
     `;
 }
 });
+
 
 
 
