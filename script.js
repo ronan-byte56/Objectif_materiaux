@@ -459,19 +459,21 @@ function terminerQuiz() {
 }
 
 // ==========================================
-// 4. INITIALISATION (LANCEMENT AUTO SI SESSION)
+// 4. INITIALISATION (FORÇAGE REPRISE SESSION)
 // ==========================================
 
 window.onload = function() {
-    // ÉTAPE 1 : On regarde direct s'il y a une session
+    // 1. On vérifie s'il y a une session en cours dans la mémoire
     const sauvegarde = JSON.parse(localStorage.getItem('quiz_encours'));
 
-    // ÉTAPE 2 : Si une session existe, on zappe le menu et on lance le jeu
     if (sauvegarde && sauvegarde.niveau) {
-        choisirNiveau(sauvegarde.niveau); 
-    } 
+        // FORCE LA REPRISE : On appelle direct choisirNiveau avec le bon niveau
+        // Cela va masquer le menu et afficher le jeu instantanément
+        choisirNiveau(sauvegarde.niveau);
+    }
 
-    // ÉTAPE 3 : On gère l'affichage du popup par-dessus (si pas encore coché)
+    // 2. On gère l'affichage du popup par-dessus
+    // S'il est là, il couvrira le jeu ou le menu jusqu'au clic
     if (!localStorage.getItem('guide_vu')) {
         document.getElementById('welcome-modal').style.display = "flex";
     }
@@ -483,8 +485,10 @@ function fermerModal() {
     }
     document.getElementById('welcome-modal').style.display = "none";
     
-    // Une fois le modal fermé, si le jeu n'est pas déjà lancé, 
-    // l'élève verra le menu normalement.
+    // Au cas où le focus s'est perdu avec le popup
+    if (document.getElementById('jeu').style.display !== 'none') {
+        document.getElementById('input-reponse').focus();
+    }
 }
 
 // ==========================================
@@ -496,6 +500,7 @@ document.addEventListener('keypress', (e) => {
         verifierReponse();
     }
 });
+
 
 
 
