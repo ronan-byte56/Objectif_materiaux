@@ -8,27 +8,63 @@
 </head>
 <body>
 
+    <div id="welcome-modal" class="modal">
+        <div class="modal-content">
+            <h2>📖 Guide de Survie : Le Quiz "Objectif Matériaux"</h2>
+            <p><i>Pour obtenir ton 20/20 et valider tes acquis, suis ces quelques conseils :</i></p>
+            
+            <div class="guide-item">
+                <p>🎯 <strong>Vise les mots-clés :</strong> L'application cherche l'idée principale. Pas besoin de faire des phrases complètes. Tape "lunettes" plutôt que "Je dois mettre mes lunettes de sécurité".</p>
+            </div>
+            <div class="guide-item">
+                <p>🪄 <strong>L'orthographe (presque) libre :</strong> Ton prof a rendu l'IA sympa ! Elle accepte souvent les mots même s'il manque un "s" ou si tu oublies un accent.</p>
+            </div>
+            <div class="guide-item">
+                <p>📟 <strong>Mots courts autorisés :</strong> Pour certaines questions complexes, les sigles fonctionnent (ex: "EPI", "PP", "PVC").</p>
+            </div>
+            <div class="guide-item">
+                <p>👹 <strong>Pas de panique en cas d'erreur :</strong> Si tu te trompes, l'application te donne la réponse et remet la question dans ton sac pour plus tard. Elle ne disparaîtra que quand tu l'auras réussie !</p>
+            </div>
+            <div class="guide-item">
+                <p>🔋 <strong>Sauvegarde automatique :</strong> Si tu fermes l'onglet, le jeu se souviendra de ton score. Tu pourras reprendre là où tu t'es arrêté.</p>
+            </div>
+
+            <button class="btn-start" onclick="fermerModal()">J'ai compris, c'est parti !</button>
+            <div class="modal-footer">
+                <label><input type="checkbox" id="nePlusAfficher"> Ne plus afficher ce guide au démarrage</label>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
-        <h1>Objectif Matériaux</h1>
+        <header>
+            <h1>Objectif Matériaux</h1>
+        </header>
 
         <div id="selection-niveau">
-            <p>Choisis ton niveau :</p>
-            <button class="btn-niveau" onclick="choisirNiveau('seconde')">Seconde</button>
-            <button class="btn-niveau" onclick="choisirNiveau('premiere')">Première</button>
-            <button class="btn-niveau" onclick="choisirNiveau('terminale')">Terminale</button>
+            <p class="subtitle">Choisis ton niveau :</p>
+            <div class="btn-group">
+                <button class="btn-lvl" onclick="choisirNiveau('seconde')">Seconde</button>
+                <button class="btn-lvl" onclick="choisirNiveau('premiere')">Première</button>
+                <button class="btn-lvl" onclick="choisirNiveau('terminale')">Terminale</button>
+            </div>
         </div>
 
         <div id="jeu" style="display:none;">
-            <div class="stats-bar">
-                <span id="timer">Temps : 0m 0s</span>
-                <span id="progression">Question 1 / 100</span>
+            <div class="quiz-stats">
+                <span id="timer">Temps : 0m 00s</span>
+                <span id="progression">Question 1 / 20</span>
             </div>
             
             <div class="card">
-                <p id="question"></p>
-                <input type="text" id="input-reponse" placeholder="Tape ta réponse..." autocomplete="off">
-                <button id="btn-valider" onclick="verifierReponse()">Valider</button>
+                <h2 id="question">Chargement...</h2>
+                <div class="input-box">
+                    <input type="text" id="input-reponse" placeholder="Tape ta réponse..." autocomplete="off">
+                    <button id="btn-valider" class="btn-go" onclick="verifierReponse()">Valider</button>
+                </div>
             </div>
+
+            <div id="feedback-message" class="feedback" style="display:none;"></div>
         </div>
     </div>
 
