@@ -459,12 +459,16 @@ function terminerQuiz() {
 }
 
 // ==========================================
-// 4. INITIALISATION (MODAL DE BIENVENUE)
+// 4. INITIALISATION (MODAL DE BIENVENUE & REPRISE)
 // ==========================================
 
 window.onload = function() {
+    // 1. On vérifie d'abord si le guide doit s'afficher
     if (!localStorage.getItem('guide_vu')) {
         document.getElementById('welcome-modal').style.display = "flex";
+    } else {
+        // 2. Si le guide est déjà masqué, on vérifie s'il y a une session à reprendre
+        verifierRepriseAutomatique();
     }
 };
 
@@ -473,8 +477,18 @@ function fermerModal() {
         localStorage.setItem('guide_vu', 'true');
     }
     document.getElementById('welcome-modal').style.display = "none";
+    
+    // 3. Après avoir fermé le modal, on vérifie aussi la reprise
+    verifierRepriseAutomatique();
 }
 
+function verifierRepriseAutomatique() {
+    const sauvegarde = JSON.parse(localStorage.getItem('quiz_encours'));
+    // Si une session existe, on lance le niveau correspondant directement
+    if (sauvegarde && sauvegarde.niveau) {
+        choisirNiveau(sauvegarde.niveau);
+    }
+}
 // ==========================================
 // 5. GESTION DES ÉVÉNEMENTS CLAVIER
 // ==========================================
@@ -484,6 +498,7 @@ document.addEventListener('keypress', (e) => {
         verifierReponse();
     }
 });
+
 
 
 
