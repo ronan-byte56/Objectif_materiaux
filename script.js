@@ -465,37 +465,37 @@ function afficherQuestion() {
     sauvegarderPartie();
 }
 
-// LA fonction verifierReponse "Zéro Bug"
 function verifierReponse() {
     const input = document.getElementById("input-reponse");
     const saisie = input.value.toLowerCase().trim();
-    
-    // On utilise qCourante pour être CERTAIN d'avoir la bonne réponse
     const qCourante = questionsAffichees[indexQuestion]; 
-    
+    const feedback = document.getElementById("feedback-message");
+
     const normaliser = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     const saisieNorm = normaliser(saisie);
 
     const estCorrect = qCourante.a.some(motCle => {
         const motCleNorm = normaliser(motCle);
-        // On accepte si l'élève contient le mot-clé OU si le mot-clé contient la saisie
         return saisieNorm.includes(motCleNorm) || motCleNorm.includes(saisieNorm);
     });
 
     if (estCorrect && saisieNorm.length >= 3) {
         score++;
-        if (!questionsReussies.includes(qCourante.q)) {
-            questionsReussies.push(qCourante.q);
-            localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
-        }
-        alert("✅ CORRECT !\n" + qCourante.r);
+        feedback.innerHTML = "✅ CORRECT !<br><br><small>" + qCourante.r + "</small>";
+        feedback.style.backgroundColor = "#27ae60"; // Vert émeraude
     } else {
-        // Ici, qCourante.r garantit qu'on affiche la bonne explication !
-        alert("❌ OUPS...\nRéponse attendue : " + qCourante.r);
+        feedback.innerHTML = "❌ OUPS...<br><br><small>Réponse attendue : " + qCourante.r + "</small>";
+        feedback.style.backgroundColor = "#e74c3c"; // Rouge corail
     }
 
+    feedback.style.display = "block";
     input.value = ""; 
-    prochaineQuestion();
+
+    // On attend 2.5 secondes pour que l'élève lise, puis on passe à la suite
+    setTimeout(() => {
+        feedback.style.display = "none";
+        prochaineQuestion();
+    }, 2500);
 }
 
 function prochaineQuestion() {
@@ -558,4 +558,5 @@ function terminerQuiz() {
             <button onclick="location.reload()" style="background:none; border:1px solid #ccc; padding:10px; border-radius:5px; cursor:pointer;">Retour au menu</button>
         </div>
     `;
+
 }
