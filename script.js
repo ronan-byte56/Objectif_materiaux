@@ -3,7 +3,6 @@
 // ==========================================
 let questionsReussies = JSON.parse(localStorage.getItem('quiz_reussies')) || [];
 let questionsAffichees = [];
-let niveauActuel = "";
 let indexQuestion = 0;
 let score = 0;
 let timerGlobal = 0;
@@ -311,31 +310,20 @@ premiere: [
 // 3. LOGIQUE DU JEU
 // ==========================================
 
-function choisirNiveau(niveau) {
-    niveauActuel = niveau;
-    
-    // Filtre pour ne pas proposer les questions déjà réussies
-    let dispos = questions[niveau].filter(q => !questionsReussies.includes(q.q));
-
+function choisirNiveau(niv) {
+    let dispos = questions[niv].filter(q => !questionsReussies.includes(q.q));
     if (dispos.length === 0) {
-        if (confirm("Félicitations ! Tu as tout validé dans ce niveau. Recommencer ?")) {
-            questionsReussies = questionsReussies.filter(qText => !questions[niveau].some(q => q.q === qText));
-            localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
-            dispos = questions[niveau];
-        } else { return; }
+        if (confirm("Niveau fini ! Recommencer ?")) {
+            questionsReussies = [];
+            localStorage.setItem('quiz_reussies', "[]");
+            dispos = questions[niv];
+        } else return;
     }
-
-    // Mélange aléatoire
     dispos.sort(() => Math.random() - 0.5);
-    questionsAffichees = dispos.slice(0, 20); // 20 questions max par session
+    questionsAffichees = dispos.slice(0, 20);
     
-    indexQuestion = 0;
-    score = 0;
-    timerGlobal = 0;
-
     document.getElementById("selection-niveau").style.display = "none";
     document.getElementById("jeu").style.display = "block";
-
     lancerTimer();
     afficherQuestion();
 }
@@ -354,87 +342,59 @@ function verifierReponse() {
     const saisie = input.value.toLowerCase().trim();
     const q = questionsAffichees[indexQuestion];
 
-    // Normalisation pour ignorer les accents
-    const norm = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    const saisieNorm = norm(saisie);
+    const norm = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const estOk = q.a.some(m => norm(saisie).includes(norm(m)) || norm(m).includes(norm(saisie)));
 
-    const estCorrect = q.a.some(mot => norm(mot).includes(saisieNorm) || saisieNorm.includes(norm(mot)));
-
-    if (estCorrect && saisieNorm.length >= 2) {
+    if (estOk && saisie.length > 1) {
         score++;
         if (!questionsReussies.includes(q.q)) {
             questionsReussies.push(q.q);
             localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
         }
-        feedback.innerHTML = "✅ CORRECT !<br><small>" + q.r + "</small>";
-        feedback.style.backgroundColor = "#27ae60";
+        feedback.className = "feedback correct";
+        feedback.innerHTML = "✅ BIEN JOUÉ !<br><small>" + q.r + "</small>";
     } else {
-        feedback.innerHTML = "❌ OUPS...<br><small>La réponse était : " + q.r + "</small>";
-        feedback.style.backgroundColor = "#e74c3c";
+        feedback.className = "feedback erreur";
+        feedback.innerHTML = "❌ PAS TOUT À FAIT...<br><small>Réponse : " + q.r + "</small>";
     }
 
     feedback.style.display = "block";
-
     setTimeout(() => {
         feedback.style.display = "none";
-        prochaineQuestion();
-    }, 2500);
-}
-
-function prochaineQuestion() {
-    indexQuestion++;
-    if (indexQuestion < questionsAffichees.length) {
-        afficherQuestion();
-    } else {
-        terminerQuiz();
-    }
+        indexQuestion++;
+        if (indexQuestion < questionsAffichees.length) afficherQuestion();
+        else terminer();
+    }, 2800);
 }
 
 function lancerTimer() {
-    if (intervalTimer) clearInterval(intervalTimer);
     intervalTimer = setInterval(() => {
         timerGlobal++;
-        const m = Math.floor(timerGlobal / 60);
-        const s = timerGlobal % 60;
-        document.getElementById("timer").innerText = `Temps : ${m}m ${s < 10 ? "0"+s : s}s`;
+        let m = Math.floor(timerGlobal/60);
+        let s = timerGlobal%60;
+        document.getElementById("timer").innerText = `Temps : ${m}m ${s < 10 ? '0'+s : s}s`;
     }, 1000);
 }
 
-function terminerQuiz() {
+function terminer() {
     clearInterval(intervalTimer);
-    const m = Math.floor(timerGlobal / 60);
-    const s = timerGlobal % 60;
-
-    document.getElementById("jeu").innerHTML = `
-        <div style="padding: 20px; text-align:center;">
-            <h2>🏆 Session terminée !</h2>
-            <p style="font-size: 1.4em;">Score : <span style="color: #27ae60;">${score} / ${questionsAffichees.length}</span></p>
-            <p>Temps : ${m}m ${s < 10 ? "0"+s : s}s</p>
-            <hr>
-            <button class="btn-niveau" onclick="window.open('https://forms.gle/6LK9Z9YFW3p9jzz87')">Envoyer mes résultats</button>
-            <br><br>
-            <button onclick="location.reload()" style="background:none; border:1px solid #ccc; padding:10px; border-radius:5px; cursor:pointer;">Retour au menu</button>
-        </div>
-    `;
+    document.getElementById("jeu").innerHTML = `<div class="card"><h2>🏆 Terminé ! Score : ${score}/${questionsAffichees.length}</h2><button class="btn-lvl" onclick="location.reload()">Retour</button></div>`;
 }
 
-// ==========================================
-// 4. INITIALISATION
-// ==========================================
-
-window.onload = function() {
-    if (!localStorage.getItem('guide_vu')) {
-        document.getElementById('welcome-modal').style.display = "flex";
-    }
+// GESTION MODAL
+window.onload = () => {
+    if (!localStorage.getItem('guide_vu')) document.getElementById('welcome-modal').style.display = "flex";
 };
 
 function fermerModal() {
-    if (document.getElementById('nePlusAfficher').checked) {
-        localStorage.setItem('guide_vu', 'true');
-    }
+    if (document.getElementById('nePlusAfficher').checked) localStorage.setItem('guide_vu', 'true');
     document.getElementById('welcome-modal').style.display = "none";
 }
 
-
-
+// --- AJOUT : VALIDATION AVEC LA TOUCHE ENTREE ---
+document.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && document.getElementById('jeu').style.display !== 'none') {
+        verifierReponse();
+    }
+});
 
