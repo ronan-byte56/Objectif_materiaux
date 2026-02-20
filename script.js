@@ -36,7 +36,31 @@ const questions = {
         { q: "HSE : Pourquoi ne jamais manger dans l'atelier ?", a: ["ingestion", "contamination", "toxique", "manger", "avaler", "produit"], r: "Pour éviter d'ingérer des produits chimiques." },
         { q: "SÉCURITÉ : Que signifie le sigle VLEP ?", a: ["exposition", "limite", "valeur", "pro", "travail"], r: "Valeur Limite d'Exposition Professionnelle." },
 
-        // --- CALCULS (Réponses numériques + unités si l'élève les met) ---
+        // --- COMPLÉMENT MATÉRIAUX ---
+       { q: "MATÉRIAUX : Quel est le contraire d'un matériau opaque ?", a: ["transparent", "clair", "translucide"], r: "Un matériau transparent (qui laisse passer la lumière)." },
+       { q: "MATÉRIAUX : Comment appelle-t-on un plastique qui résiste aux rayons du soleil ?", a: ["anti-uv", "uv", "solaire"], r: "Un matériau traité anti-UV." },
+       { q: "MATÉRIAUX : Que signifie le sigle 'ABS' ?", a: ["acrylonitrile", "butadiene", "styrene"], r: "Acrylonitrile Butadiène Styrène (utilisé pour les LEGO)." },
+       { q: "MATÉRIAUX : Quelle est la principale origine du plastique ?", a: ["petrole", "pétrole", "hydrocarbure"], r: "Le pétrole brut." },
+       { q: "MATÉRIAUX : Comment appelle-t-on un plastique d'origine végétale ?", a: ["biosource", "bio", "plante", "vert"], r: "Un plastique biosourcé (ex: PLA à base de maïs)." },
+       { q: "MATÉRIAUX : Quel est l'aspect visuel d'une résine chargée avec de la fibre de carbone ?", a: ["noir", "tresse", "gris"], r: "Elle est noire (couleur naturelle du carbone)." },
+       { q: "MATÉRIAUX : Qu'est-ce qu'une charge dans un plastique ?", a: ["poudre", "remplir", "moins cher", "mineral"], r: "Une poudre ajoutée pour réduire le coût ou durcir le matériau." },
+       { q: "MATÉRIAUX : Quel plastique utilise-t-on pour les tuyaux d'évacuation d'eau gris ?", a: ["pvc"], r: "Le PVC (Polychlorure de Vinyle)." },
+       { q: "MATÉRIAUX : Un matériau qui peut être étiré sans casser est dit...", a: ["ductile", "etirable", "mou"], r: "Ductile." },
+       { q: "MATÉRIAUX : Quel est le sigle du Polyamide (type Nylon) ?", a: ["pa"], r: "Le PA." },
+
+        // --- PROCÉDÉS & OUTILLAGE ---
+       { q: "ATELIER : Comment appelle-t-on l'outil pour étaler la résine ?", a: ["pinceau", "rouleau", "pattes de lapin"], r: "Le pinceau ou le rouleau (patte de lapin)." },
+       { q: "PROCÉDÉ : Comment appelle-t-on le moule en deux parties (mâle/femelle) ?", a: ["moule", "contre-moule", "injection"], r: "Moule et contre-moule." },
+       { q: "ATELIER : Quel outil utilise-t-on pour chasser les bulles d'air ?", a: ["ebulleur", "rouleau acier", "bulle"], r: "Un ébulleur." },
+       { q: "PROCÉDÉ : Dans quel sens doit-on poncer pour une belle finition ?", a: ["circulaire", "rond", "croise"], r: "En mouvements circulaires ou croisés." },
+       { q: "OUTILLAGE : Quel appareil sert à mesurer précisément l'épaisseur d'une pièce ?", a: ["pied a coulisse", "palmer", "micrometre"], r: "Un pied à coulisse." },
+       { q: "PROCÉDÉ : Comment appelle-t-on la première couche de peinture dans un moule ?", a: ["gelcoat", "gel coat", "finition"], r: "Le Gel-coat." },
+       { q: "ATELIER : À quoi sert une étuve ?", a: ["chauffer", "cuire", "secher", "durcir"], r: "À chauffer les pièces pour accélérer le durcissement (post-cuisson)." },
+       { q: "PROCÉDÉ : Qu'est-ce que le 'démoulage' ?", a: ["sortir", "extraire", "enlever"], r: "L'action de sortir la pièce finie du moule." },
+       { q: "ATELIER : Pourquoi utilise-t-on une balance de précision ?", a: ["doser", "peser", "melange", "gramme"], r: "Pour respecter le dosage exact résine / catalyseur." },
+       { q: "PROCÉDÉ : Qu'est-ce qu'un renfort dans un composite ?", a: ["fibre", "verre", "carbone", "tissu"], r: "C'est la fibre (verre, carbone, kevlar) qui donne la solidité." },
+    
+       // --- CALCULS (Réponses numériques + unités si l'élève les met) ---
         { q: "CALCUL : 1 kg de résine dosée à 2% de catalyseur. Masse de catalyseur en grammes ?", a: ["20"], r: "20g (1000 * 0,02)." },
         { q: "CALCUL : 400g de résine dosée à 3% de catalyseur. Masse de catalyseur ?", a: ["12"], r: "12g (400 * 0,03)." },
         { q: "CALCUL : 2,5 kg de résine dosée à 1% de catalyseur. Masse de catalyseur en grammes ?", a: ["25"], r: "25g (2500 * 0,01)." },
@@ -44,6 +68,13 @@ const questions = {
         { q: "MESURE : Un échantillon pèse 0,05 kg. Combien de grammes cela fait-il ?", a: ["50"], r: "50g." },
         { q: "CALCUL : Un pot de 200g de gel-coat dosé à 2%. Masse de catalyseur ?", a: ["4"], r: "4g." },
 
+        // --- CALCULS ---
+       { q: "CALCUL : Pour 500g de résine à 2%, combien de grammes de catalyseur ?", a: ["10"], r: "10g (500 * 0,02)." },
+       { q: "MESURE : Convertir 1,2 kg en grammes.", a: ["1200"], r: "1200g." },
+       { q: "CALCUL : Si je mélange 100g de résine et 2g de catalyseur, quelle est la masse totale ?", a: ["102"], r: "102g." },
+       { q: "MESURE : Combien de centimètres y a-t-il dans 1 mètre ?", a: ["100"], r: "100 cm." },
+       { q: "CALCUL : Un pot vide pèse 50g. Avec la résine, il pèse 250g. Quelle est la masse de résine ?", a: ["200"], r: "200g." },
+              
         // --- MATÉRIAUX : POLYMÈRES ---
         { q: "MATÉRIAUX : Famille de plastiques qui ramollissent à la chaleur ?", a: ["thermoplastique", "tp", "fond", "mou"], r: "Les thermoplastiques." },
         { q: "MATÉRIAUX : Famille de résine qui durcit de façon irréversible ?", a: ["thermodurcissable", "td", "durcit", "cuit"], r: "Les thermodurcissables." },
@@ -515,6 +546,7 @@ document.addEventListener('keypress', (e) => {
         verifierReponse();
     }
 });
+
 
 
 
