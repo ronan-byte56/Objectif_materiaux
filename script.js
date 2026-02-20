@@ -477,6 +477,7 @@ function verifierReponse() {
 
     if (estCorrect && saisieNorm.length >= 3) {
         score++;
+		if (!questionsReussies.includes(qCourante.q)) { questionsReussies.push(qCourante.q); }
         feedback.innerHTML = "✅ CORRECT !<br><br><small>" + qCourante.r + "</small>";
         feedback.style.backgroundColor = "#27ae60"; // Vert émeraude
     } else {
@@ -556,4 +557,5 @@ function terminerQuiz() {
     `;
 
 }
+
 
