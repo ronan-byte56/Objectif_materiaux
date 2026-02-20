@@ -1,6 +1,6 @@
 {
-  "short_name": "Quiz Matériaux",
-  "name": "Objectif Matériaux : Le Quiz",
+ "name": "Objectif Matériaux",
+  "short_name": "Obj. Matériaux",
   "icons": [
     {
       "src": "logo.png",
