@@ -3,6 +3,7 @@
 // ==========================================
 let questionsReussies = JSON.parse(localStorage.getItem('quiz_reussies')) || [];
 let questionsAffichees = [];
+let niveauActuel = ""; // Ajout pour le suivi du niveau
 let indexQuestion = 0;
 let score = 0;
 let timerGlobal = 0;
@@ -307,166 +308,168 @@ premiere: [
   ]
 };
 // ==========================================
-// MÉCANIQUE DU JEU
+// 3. LOGIQUE DU JEU
 // ==========================================
 
 function choisirNiveau(niveau) {
-    niveauActuel = niveau;
+    niveauActuel = niveau; // On stocke le niveau choisi
     
-    // On ne garde que les questions dont l'énoncé (q) n'est pas dans questionsReussies
-    let questionsDisponibles = questions[niveauActuel].filter(q => !questionsReussies.includes(q.q));
+    // Filtre pour ne pas proposer les questions déjà réussies pour ce niveau
+    let dispos = questions[niveau].filter(q => !questionsReussies.includes(q.q));
 
-    // Si tout est réussi, on propose de recommencer le niveau à zéro
-    if (questionsDisponibles.length === 0) {
-        if (confirm("Félicitations ! Tu as validé toutes les questions. Veux-tu recommencer ce niveau ?")) {
-            questionsReussies = questionsReussies.filter(qText => !questions[niveauActuel].some(q => q.q === qText));
+    if (dispos.length === 0) {
+        if (confirm("Félicitations ! Tu as validé toutes les questions de ce niveau. Recommencer ?")) {
+            // Retire seulement les questions du niveau actuel de la liste des réussites
+            questionsReussies = questionsReussies.filter(qText => !questions[niveau].some(q => q.q === qText));
             localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
-            questionsDisponibles = questions[niveauActuel];
-        } else { return; }
+            dispos = questions[niveau]; // Recharge toutes les questions du niveau
+        } else { return; } // Si l'utilisateur annule, on ne fait rien
     }
 
-    melanger(questionsDisponibles);
-    questionsAffichees = questionsDisponibles.slice(0, 20); // Ta session de 20
+    // Mélange aléatoire (Fisher-Yates)
+    for (let i = dispos.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [dispos[i], dispos[j]] = [dispos[j], dispos[i]];
+    }
+
+    // Prend 20 questions maximum pour la session actuelle
+    questionsAffichees = dispos.slice(0, 20); 
     
+    // Réinitialise les compteurs pour la nouvelle session
     indexQuestion = 0;
-    score = parseInt(localStorage.getItem('quiz_score')) || 0;
+    score = 0;
+    timerGlobal = 0;
+
+    // Met à jour l'affichage
     document.getElementById("selection-niveau").style.display = "none";
     document.getElementById("jeu").style.display = "block";
+
     lancerTimer();
     afficherQuestion();
-}
-
-function lancerTimer() {
-    // On réinitialise l'intervalle s'il existait déjà
-    if (intervalTimer) clearInterval(intervalTimer);
-    
-    intervalTimer = setInterval(() => {
-        timerGlobal++;
-        const m = Math.floor(timerGlobal / 60);
-        const s = timerGlobal % 60;
-        // On ajoute un '0' devant les secondes si < 10
-        const secondesAffichees = s < 10 ? "0" + s : s;
-        document.getElementById("timer").innerText = `Temps : ${m}m ${secondesAffichees}s`;
-    }, 1000);
 }
 
 function afficherQuestion() {
-    const q = questions[niveauActuel][indexQuestion];
+    // S'assure qu'il y a des questions à afficher
+    if (indexQuestion >= questionsAffichees.length) {
+        terminerQuiz();
+        return;
+    }
+    const q = questionsAffichees[indexQuestion];
     document.getElementById("question").innerText = q.q;
     document.getElementById("input-reponse").value = "";
-    
-    // On affiche la progression sur 20 pour que ce soit plus motivant
-    document.getElementById("progression").innerText = `Question ${indexQuestion + 1} / 20`;
-    
+    document.getElementById("progression").innerText = `Question ${indexQuestion + 1} / ${questionsAffichees.length}`;
     document.getElementById("input-reponse").focus();
-    sauvegarderPartie();
 }
 
 function verifierReponse() {
-    const saisie = document.getElementById("input-reponse").value.toLowerCase().trim();
-    // On utilise bien questionsAffichees qui contient tes 20 questions du moment
-    const qCourante = questionsAffichees[indexQuestion]; 
-    
-    const normaliser = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    const estCorrect = qCourante.a.some(motCle => normaliser(saisie).includes(normaliser(motCle)));
+    const input = document.getElementById("input-reponse");
+    const feedback = document.getElementById("feedback-message");
+    const saisie = input.value.toLowerCase().trim();
+    const q = questionsAffichees[indexQuestion];
 
-    if (estCorrect) {
+    // Normalisation pour ignorer les accents et la casse
+    const norm = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const saisieNorm = norm(saisie);
+
+    // Vérifie si l'un des mots-clés est présent dans la réponse normalisée
+    const estCorrect = q.a.some(mot => saisieNorm.includes(norm(mot)) || norm(mot).includes(saisieNorm));
+
+    if (estCorrect && saisieNorm.length >= 2) { // Réponse considérée correcte si au moins 2 caractères
         score++;
-        // On bloque la question pour qu'elle ne revienne plus jamais
-        if (!questionsReussies.includes(qCourante.q)) {
-            questionsReussies.push(qCourante.q);
+        // Ajoute la question à la liste des réussies si elle n'y est pas déjà
+        if (!questionsReussies.includes(q.q)) { 
+            questionsReussies.push(q.q);
             localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
         }
-        alert("✅ CORRECT !\n" + qCourante.r);
+        feedback.className = "feedback correct"; // Applique la classe CSS pour le vert
+        feedback.innerHTML = "✅ BIEN JOUÉ !<br><small>" + q.r + "</small>";
     } else {
-        // La question n'est pas ajoutée à questionsReussies, elle reviendra donc
-        alert("❌ DOMMAGE...\nLa question reviendra plus tard.\nRéponse attendue : " + qCourante.r);
+        feedback.className = "feedback erreur"; // Applique la classe CSS pour le rouge
+        feedback.innerHTML = "❌ PAS TOUT À FAIT...<br><small>Réponse attendue : " + q.r + "</small>";
     }
 
-    prochaineQuestion();
-}
-
-function prochaineQuestion() {
-    indexQuestion++;
+    feedback.style.display = "block"; // Affiche le feedback
     
-    // On vérifie deux conditions pour continuer :
-    // 1. On n'a pas encore fait 20 questions
-    // 2. Il reste encore des questions dans la liste
-    if (indexQuestion < 20 && indexQuestion < questions[niveauActuel].length) {
-        afficherQuestion();
-    } else {
-        terminerQuiz();
-    }
+    // Attend 2.8 secondes avant de passer à la question suivante
+    setTimeout(() => {
+        feedback.style.display = "none";
+        indexQuestion++; // Passe à la question suivante
+        if (indexQuestion < questionsAffichees.length) {
+            afficherQuestion(); // Affiche la nouvelle question
+        } else {
+            terminerQuiz(); // Termine le quiz si toutes les questions sont passées
+        }
+    }, 2800);
 }
 
-function melanger(tableau) {
-    for (let i = tableau.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [tableau[i], tableau[j]] = [tableau[j], tableau[i]];
-    }
-    return tableau;
+function lancerTimer() {
+    if (intervalTimer) clearInterval(intervalTimer); // Empêche plusieurs timers de tourner
+    intervalTimer = setInterval(() => {
+        timerGlobal++;
+        const m = Math.floor(timerGlobal / 60); // Minutes
+        const s = timerGlobal % 60; // Secondes
+        document.getElementById("timer").innerText = `Temps : ${m}m ${s < 10 ? "0" + s : s}s`;
+    }, 1000); // Met à jour toutes les secondes
 }
-
-// ==========================================
-// SAUVEGARDE (Local Storage)
-// ==========================================
-
-function sauvegarderPartie() {
-    localStorage.setItem('quiz_niveau', niveauActuel);
-    localStorage.setItem('quiz_index', indexQuestion);
-    localStorage.setItem('quiz_score', score);
-    localStorage.setItem('quiz_timer', timerGlobal);
-}
-
-function chargerPartie() {
-    niveauActuel = localStorage.getItem('quiz_niveau');
-    questionsAffichees = questions[niveauActuel];   
-    indexQuestion = parseInt(localStorage.getItem('quiz_index'));
-    score = parseInt(localStorage.getItem('quiz_score'));
-    timerGlobal = parseInt(localStorage.getItem('quiz_timer'));
-
-    document.getElementById("selection-niveau").style.display = "none";
-    document.getElementById("jeu").style.display = "block";
-    
-    lancerTimer();
-    afficherQuestion();
-}
-
-// ==========================================
-// FIN DE SESSION
-// ==========================================
 
 function terminerQuiz() {
-    clearInterval(intervalTimer);
-    localStorage.clear(); // On vide le timer et l'index en cours, mais PAS les réussites
-
-    // On calcule combien de questions du niveau actuel sont dans la liste des réussites
+    clearInterval(intervalTimer); // Arrête le timer
+    
+    // Calcule la progression totale du niveau
     const totalNiveau = questions[niveauActuel].length;
     const nbReussies = questionsReussies.filter(qText => questions[niveauActuel].some(q => q.q === qText)).length;
-    
-    const scoreFinal = `${nbReussies} / ${totalNiveau}`;
+    const progressionNiveau = `${nbReussies} / ${totalNiveau}`;
+
     const m = Math.floor(timerGlobal / 60);
     const s = timerGlobal % 60;
-    const tempsFinal = `${m}m ${s < 10 ? "0"+s : s}s`;
 
+    // Affiche l'écran de fin de quiz
     document.getElementById("jeu").innerHTML = `
-        <div style="padding: 20px;">
-            <h2>🏆 Objectif Atteint !</h2>
-            <p>Niveau : <strong>${niveauActuel.toUpperCase()}</strong></p>
-            <p style="font-size: 1.4em;">Progression totale : <span style="color: #27ae60;">${scoreFinal}</span></p>
-            <p>Temps session : ${tempsFinal}</p>
-            <hr>
-            <button class="btn-niveau" onclick="window.open('https://forms.gle/6LK9Z9YFW3p9jzz87')">
-                Envoyer mes résultats
-            </button>
+        <div class="card" style="text-align:center;">
+            <h2>🏆 OBJECTIF ATTEINT !</h2>
+            <p style="font-size: 1.4em; color: #3498db;">Niveau <strong>${niveauActuel.toUpperCase()}</strong> terminé.</p>
+            <p style="font-size: 1.2em;">Score de la session : <span style="color: #2ecc71;">${score} / ${questionsAffichees.length}</span></p>
+            <p>Progression totale du niveau : <span style="color: #2ecc71;">${progressionNiveau}</span></p>
+            <p>Temps total de la session : ${m}m ${s < 10 ? "0"+s : s}s</p>
+            <hr style="margin: 25px auto; border-color: #eee;">
+            <button class="btn-go" onclick="window.open('https://forms.gle/6LK9Z9YFW3p9jzz87', '_blank')">Envoyer mes résultats (Google Forms)</button>
             <br><br>
-            <button onclick="location.reload()" style="background: none; border: 1px solid #ccc; padding: 10px; border-radius: 5px; cursor: pointer;">
-                Retour au menu
-            </button>
+            <button class="btn-lvl" onclick="location.reload()" style="background:none; color:#555; border:1px solid #ccc;">Retour au menu principal</button>
         </div>
     `;
 }
+
+// ==========================================
+// 4. INITIALISATION (MODAL DE BIENVENUE)
+// ==========================================
+
+// Affiche le modal au chargement si l'utilisateur ne l'a pas masqué
+window.onload = function() {
+    if (!localStorage.getItem('guide_vu')) {
+        document.getElementById('welcome-modal').style.display = "flex";
+    }
+};
+
+// Fonction pour fermer le modal
+function fermerModal() {
+    if (document.getElementById('nePlusAfficher').checked) {
+        localStorage.setItem('guide_vu', 'true'); // Enregistre que le guide a été vu
+    }
+    document.getElementById('welcome-modal').style.display = "none";
+}
+
+// ==========================================
+// 5. GESTION DES ÉVÉNEMENTS CLAVIER
+// ==========================================
+
+// Permet de valider la réponse en appuyant sur "Entrée"
+document.addEventListener('keypress', (e) => {
+    // Vérifie si la touche est "Entrée" et si l'écran de jeu est visible
+    if (e.key === 'Enter' && document.getElementById('jeu').style.display !== 'none') {
+        verifierReponse(); // Appelle la fonction de vérification
+    }
 });
+
 
 
 
