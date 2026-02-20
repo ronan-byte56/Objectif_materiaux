@@ -3,55 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Plasturgie & Composites</title>
+    <title>Objectif Matériaux</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="welcome-modal" class="modal">
         <div class="modal-content">
-            <h2>Bienvenue sur l'App de Révision ! 🛠️</h2>
-            <div class="guide-section">
-                <p><strong>Comment jouer ?</strong></p>
-                <ul>
-                    <li>Choisis ton niveau (2nde, 1ère, Term).</li>
-                    <li>Réponds par <strong>mots-clés</strong> (ex: pour "EPI", tape "protection").</li>
-                    <li>Le jeu se souvient des questions réussies !</li>
-                </ul>
+            <h2>📖 Guide de Survie : Le Quiz "Objectif Matériaux"</h2>
+            <p><i>Pour obtenir ton 20/20 et valider tes acquis, suis ces quelques conseils :</i></p>
+            
+            <div class="guide-item">
+                <p>🎯 <strong>Vise les mots-clés :</strong> L'application cherche l'idée principale. Pas besoin de phrases complètes.</p>
             </div>
+            <div class="guide-item">
+                <p>🪄 <strong>L'orthographe (presque) libre :</strong> L'IA accepte les mots même s'il manque un "s" ou un accent.</p>
+            </div>
+            <div class="guide-item">
+                <p>📟 <strong>Mots courts autorisés :</strong> Les sigles fonctionnent (ex: "EPI", "PP", "PVC").</p>
+            </div>
+            <div class="guide-item">
+                <p>👹 <strong>Pas de panique en cas d'erreur :</strong> L'appli te donne la réponse et remet la question dans ton sac pour plus tard.</p>
+            </div>
+            <div class="guide-item">
+                <p>🔋 <strong>Sauvegarde automatique :</strong> Ton score est enregistré. Tu peux reprendre là où tu t'es arrêté.</p>
+            </div>
+
+            <button class="btn-start" onclick="fermerModal()">J'ai compris, c'est parti !</button>
             <div class="modal-footer">
-                <label>
-                    <input type="checkbox" id="nePlusAfficher"> Ne plus afficher ce guide
-                </label>
-                <button class="btn-niveau" onclick="fermerModal()">C'est parti !</button>
+                <label><input type="checkbox" id="nePlusAfficher"> Ne plus afficher ce guide au démarrage</label>
             </div>
         </div>
     </div>
 
     <div class="container">
-        <div id="selection-niveau" class="menu-card">
-            <h1>🎓 Quiz Plasturgie</h1>
-            <p>Sélectionnez votre niveau pour commencer</p>
-            <div class="button-group">
-                <button class="btn-niveau" onclick="choisirNiveau('seconde')">Seconde</button>
-                <button class="btn-niveau" onclick="choisirNiveau('premiere')">Première</button>
-                <button class="btn-niveau" onclick="choisirNiveau('terminale')">Terminale</button>
+        <header>
+            <h1>Objectif Matériaux</h1>
+        </header>
+
+        <div id="selection-niveau">
+            <p class="subtitle">Choisis ton niveau :</p>
+            <div class="btn-group">
+                <button class="btn-lvl" onclick="choisirNiveau('seconde')">Seconde</button>
+                <button class="btn-lvl" onclick="choisirNiveau('premiere')">Première</button>
+                <button class="btn-lvl" onclick="choisirNiveau('terminale')">Terminale</button>
             </div>
         </div>
 
-        <div id="jeu" style="display:none;" class="quiz-card">
-            <div class="header-quiz">
-                <div id="timer" class="stat-badge">Temps : 0m 00s</div>
-                <div id="progression" class="stat-badge">Question 1 / 20</div>
+        <div id="jeu" style="display:none;">
+            <div class="quiz-stats">
+                <span id="timer">Temps : 0m 00s</span>
+                <span id="progression">Question 1 / 20</span>
             </div>
             
-            <div class="question-container">
-                <h2 id="question">Préparation de la question...</h2>
-            </div>
-            
-            <div class="input-container">
-                <input type="text" id="input-reponse" placeholder="Tapez votre réponse ici..." autocomplete="off">
-                <button class="btn-valider" onclick="verifierReponse()">Valider</button>
+            <div class="card">
+                <h2 id="question">Chargement...</h2>
+                <div class="input-box">
+                    <input type="text" id="input-reponse" placeholder="Tape ta réponse..." autocomplete="off">
+                    <button id="btn-valider" class="btn-go" onclick="verifierReponse()">Valider</button>
+                </div>
             </div>
 
             <div id="feedback-message" class="feedback" style="display:none;"></div>
