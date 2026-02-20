@@ -499,7 +499,7 @@ function afficherNotifReprise() {
     const notif = document.getElementById('notif-reprise');
     if (notif) {
         notif.style.display = 'block'; // On l'affiche
-        
+
         // On le cache automatiquement après 4 secondes
         setTimeout(() => {
             notif.style.display = 'none';
@@ -515,6 +515,7 @@ document.addEventListener('keypress', (e) => {
         verifierReponse();
     }
 });
+
 
 
 
