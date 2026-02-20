@@ -498,12 +498,12 @@ function fermerModal() {
 function afficherNotifReprise() {
     const notif = document.getElementById('notif-reprise');
     if (notif) {
-        notif.style.display = 'block'; // On le montre
+        notif.style.display = 'block'; // On l'affiche
         
-        // On le cache automatiquement après 3 secondes
+        // On le cache automatiquement après 4 secondes
         setTimeout(() => {
             notif.style.display = 'none';
-        }, 3000);
+        }, 4000);
     }
 }
 // ==========================================
@@ -515,6 +515,7 @@ document.addEventListener('keypress', (e) => {
         verifierReponse();
     }
 });
+
 
 
 
