@@ -8,6 +8,7 @@ let indexQuestion = 0;
 let score = 0;
 let timerGlobal = 0;
 let intervalTimer;
+let peutValider = true; // Cette variable servira de verrou
 
 // ==========================================
 // 2. BASE DE DONNÉES
@@ -408,10 +409,14 @@ function afficherQuestion() {
 }
 
 function verifierReponse() {
+    if (!peutValider) return; // SI LE VERROU EST FERMÉ, ON S'ARRÊTE LÀ
+    
     const input = document.getElementById("input-reponse");
     const feedback = document.getElementById("feedback-message");
     const saisie = input.value.toLowerCase().trim();
-    if (!saisie) return; // Évite de valider du vide
+    if (!saisie) return;
+
+    peutValider = false; // ON FERME LE VERROU IMMÉDIATEMENT
 
     const q = questionsAffichees[indexQuestion];
 
@@ -546,6 +551,7 @@ document.addEventListener('keypress', (e) => {
         verifierReponse();
     }
 });
+
 
 
 
