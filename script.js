@@ -312,35 +312,26 @@ premiere: [
 // ==========================================
 
 function choisirNiveau(niveau) {
-    niveauActuel = niveau; // On stocke le niveau choisi
+    niveauActuel = niveau;
     
-    // Filtre pour ne pas proposer les questions déjà réussies pour ce niveau
+    // On récupère les questions pas encore réussies
     let dispos = questions[niveau].filter(q => !questionsReussies.includes(q.q));
 
+    // Si tout est fini, on réinitialise sans demander
     if (dispos.length === 0) {
-        if (confirm("Félicitations ! Tu as validé toutes les questions de ce niveau. Recommencer ?")) {
-            // Retire seulement les questions du niveau actuel de la liste des réussites
-            questionsReussies = questionsReussies.filter(qText => !questions[niveau].some(q => q.q === qText));
-            localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
-            dispos = questions[niveau]; // Recharge toutes les questions du niveau
-        } else { return; } // Si l'utilisateur annule, on ne fait rien
+        questionsReussies = questionsReussies.filter(qText => !questions[niveau].some(q => q.q === qText));
+        localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
+        dispos = questions[niveau];
     }
 
-    // Mélange aléatoire (Fisher-Yates)
-    for (let i = dispos.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [dispos[i], dispos[j]] = [dispos[j], dispos[i]];
-    }
-
-    // Prend 20 questions maximum pour la session actuelle
-    questionsAffichees = dispos.slice(0, 20); 
+    // Mélange et sélection des 20 questions
+    dispos.sort(() => Math.random() - 0.5);
+    questionsAffichees = dispos.slice(0, 20);
     
-    // Réinitialise les compteurs pour la nouvelle session
     indexQuestion = 0;
     score = 0;
     timerGlobal = 0;
 
-    // Met à jour l'affichage
     document.getElementById("selection-niveau").style.display = "none";
     document.getElementById("jeu").style.display = "block";
 
@@ -469,6 +460,7 @@ document.addEventListener('keypress', (e) => {
         verifierReponse(); // Appelle la fonction de vérification
     }
 });
+
 
 
 
