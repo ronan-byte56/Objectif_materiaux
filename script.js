@@ -409,20 +409,21 @@ function afficherQuestion() {
 }
 
 function verifierReponse() {
-    if (!peutValider) return; // SI LE VERROU EST FERMÉ, ON S'ARRÊTE LÀ
-    
+    if (!peutValider) return;
+
     const input = document.getElementById("input-reponse");
     const feedback = document.getElementById("feedback-message");
     const saisie = input.value.toLowerCase().trim();
-    if (!saisie) return;
+    
+    // On vérifie d'abord s'il y a une réponse
+    if (!saisie) return; 
 
-    peutValider = false; // ON FERME LE VERROU IMMÉDIATEMENT
+    // SI OK, ON FERME LE VERROU ICI
+    peutValider = false; 
 
     const q = questionsAffichees[indexQuestion];
-
     const norm = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     const saisieNorm = norm(saisie);
-
     const estCorrect = q.a.some(mot => saisieNorm.includes(norm(mot)) || norm(mot).includes(saisieNorm));
 
     if (estCorrect && saisieNorm.length >= 2) {
@@ -439,8 +440,6 @@ function verifierReponse() {
     }
 
     feedback.style.display = "block";
-    
-    // On sauvegarde le score mis à jour avant de passer à la suite
     sauvegarderSession();
 
     setTimeout(() => {
@@ -448,7 +447,7 @@ function verifierReponse() {
         indexQuestion++;
         if (indexQuestion < questionsAffichees.length) {
             afficherQuestion();
-        peutValider = true;       
+            peutValider = true; // RÉOUVERTURE DU VERROU
         } else {
             terminerQuiz();
         }
@@ -552,6 +551,7 @@ document.addEventListener('keypress', (e) => {
         verifierReponse();
     }
 });
+
 
 
 
