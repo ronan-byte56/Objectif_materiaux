@@ -27,7 +27,7 @@ const questions = {
         { q: "SÉCURITÉ : Où trouver les dangers d'un produit chimique ?", a: ["fds", "etiquette", "fiche", "donnees"], r: "Sur la Fiche de Données de Sécurité (FDS)." },
         { q: "SÉCURITÉ : Peut-on utiliser de l'acétone pour se nettoyer les mains ?", a: ["non", "interdit", "pas"], r: "Non, c'est toxique pour le sang et la peau." },
         { q: "SÉCURITÉ : Que signifie le pictogramme avec un point d'exclamation ?", a: ["irritant", "nocif", "danger", "attention"], r: "Produit irritant ou nocif." },
-        { q: "HSE : Pourquoi faut-1l ventiler l'atelier composite ?", a: ["vapeurs", "styrene", "odeur", "air", "respirer", "gaz"], r: "Pour évacuer les vapeurs toxiques (styrène)." },
+        { q: "HSE : Pourquoi faut-il ventiler l'atelier composite ?", a: ["vapeurs", "styrene", "odeur", "air", "respirer", "gaz"], r: "Pour évacuer les vapeurs toxiques (styrène)." },
         { q: "SÉCURITÉ : Pourquoi attacher ses cheveux longs en atelier ?", a: ["happe", "colle", "machine", "attrape", "tourner"], r: "Pour éviter qu'ils soient happés ou collés." },
         { q: "SÉCURITÉ : Quel est le risque principal de l'acétone ?", a: ["incendie", "inflammable", "feu", "explosion"], r: "Elle est extrêmement inflammable." },
         { q: "HSE : Où jette-t-on les chiffons souillés de résine ?", a: ["dangereux", "specifique", "poubelle rouge", "bac"], r: "Dans le bac des déchets dangereux." },
@@ -546,6 +546,7 @@ document.addEventListener('keypress', (e) => {
         verifierReponse();
     }
 });
+
 
 
 
