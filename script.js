@@ -305,120 +305,102 @@ premiere: [
   ]
 };
 
-// ==========================================
-// FONCTIONS DE NAVIGATION
-// ==========================================
-function choisirNiveau(niveau) {
-    niveauActuel = niveau;
-    questionsAffichees = [...questions[niveau]];
-    // Mélange des questions
-    questionsAffichees.sort(() => Math.random() - 0.5);
-    
-    document.getElementById('menu-niveaux').style.display = 'none';
-    document.getElementById('quiz-container').style.display = 'block';
-    
-    indexQuestion = 0;
-    score = 0;
-    timerGlobal = 0;
-    demarrerTimer();
-    afficherQuestion();
-}
-
-function afficherQuestion() {
-    if (indexQuestion < 20 && indexQuestion < questionsAffichees.length) {
-        const q = questionsAffichees[indexQuestion];
-        document.getElementById('question-text').innerText = q.q;
-        document.getElementById('reponse-input').value = "";
-        document.getElementById('reponse-input').focus();
-        document.getElementById('num-question').innerText = (indexQuestion + 1);
-    } else {
-        terminerQuiz();
-    }
-}
-
-function validerReponse() {
-    const saisie = document.getElementById('reponse-input').value.toLowerCase().trim();
-    const q = questionsAffichees[indexQuestion];
-    
-    // Vérification simple par mots-clés
-    let correct = q.a.some(mot => saisie.includes(mot));
-    
-    if (correct) {
-        score++;
-        alert("Bravo ! \n\nRéponse complète : " + q.r);
-    } else {
-        alert("Dommage ! \n\nLa bonne réponse était : " + q.r);
-    }
-    
-    indexQuestion++;
-    afficherQuestion();
-}
-
-function demarrerTimer() {
-    intervalTimer = setInterval(() => {
-        timerGlobal++;
-        let min = Math.floor(timerGlobal / 60);
-        let sec = timerGlobal % 60;
-        document.getElementById('timer').innerText = min + "m " + sec + "s";
-    }, 1000);
-}
-
-function terminerQuiz() {
-    clearInterval(intervalTimer);
-    alert("Quiz terminé ! Score : " + score + "/20");
-    location.reload(); 
-}
-
-// Initialisation au chargement
-window.onload = function() {
-    const dejavu = localStorage.getItem('guide_vu');
-    const modal = document.getElementById('welcome-modal');
-    if (!dejavu) {
-        modal.style.display = "flex";
-    }
-};
-
-function fermerModal() {
-    const checkbox = document.getElementById('nePlusAfficher');
-    if (checkbox.checked) {
-        localStorage.setItem('guide_vu', 'true');
-    }
-    document.getElementById('welcome-modal').style.display = "none";
-}
+] // Fin du tableau terminale
+}; // Fin de l'objet questions
 
 // ==========================================
-// MÉCANIQUE DU JEU
+// MÉCANIQUE DU JEU & LOGIQUE
 // ==========================================
 
 function choisirNiveau(niveau) {
     niveauActuel = niveau;
     
-    // Filtre les questions non réussies
+    // 1. Filtre les questions non encore réussies pour ce niveau
     let questionsDisponibles = questions[niveauActuel].filter(q => !questionsReussies.includes(q.q));
 
+    // 2. Si tout est réussi, on propose de recommencer
     if (questionsDisponibles.length === 0) {
-        if (confirm("Félicitations ! Tu as validé toutes les questions. Recommencer ?")) {
+        if (confirm("Félicitations ! Tu as validé toutes les questions de ce niveau. Recommencer ?")) {
+            // On retire les questions de ce niveau de la liste des réussites
             questionsReussies = questionsReussies.filter(qText => !questions[niveauActuel].some(q => q.q === qText));
             localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
             questionsDisponibles = questions[niveauActuel];
-        } else { return; }
+        } else {
+            return; 
+        }
     }
 
-    melanger(questionsDisponibles);
+    // 3. Mélange aléatoire (Fisher-Yates)
+    for (let i = questionsDisponibles.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [questionsDisponibles[i], questionsDisponibles[j]] = [questionsDisponibles[j], questionsDisponibles[i]];
+    }
+
+    // 4. On prend 20 questions maximum pour la session
     questionsAffichees = questionsDisponibles.slice(0, 20); 
     
     indexQuestion = 0;
     score = 0; 
     timerGlobal = 0;
     
-    demarrerInterface();
-}
-
-function demarrerInterface() {
+    // 5. Mise à jour de l'interface
     document.getElementById("selection-niveau").style.display = "none";
     document.getElementById("jeu").style.display = "block";
+    
     lancerTimer();
     afficherQuestion();
+}
+
+function afficherQuestion() {
+    const q = questionsAffichees[indexQuestion];
+    document.getElementById("question").innerText = q.q;
+    document.getElementById("input-reponse").value = "";
+    document.getElementById("progression").innerText = `Question ${indexQuestion + 1} / ${questionsAffichees.length}`;
+    document.getElementById("input-reponse").focus();
+}
+
+function verifierReponse() {
+    const input = document.getElementById("input-reponse");
+    const saisie = input.value.toLowerCase().trim();
+    const qCourante = questionsAffichees[indexQuestion]; 
+    const feedback = document.getElementById("feedback-message");
+
+    // Normalisation pour ignorer les accents (ex: "étuve" devient "etuve")
+    const normaliser = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const saisieNorm = normaliser(saisie);
+
+    // Vérification si l'un des mots-clés est présent dans la réponse
+    const estCorrect = qCourante.a.some(motCle => {
+        const motCleNorm = normaliser(motCle);
+        return saisieNorm.includes(motCleNorm);
+    });
+
+    if (estCorrect && saisieNorm.length >= 2) {
+        score++;
+        // Sauvegarde de la question réussie
+        if (!questionsReussies.includes(qCourante.q)) { 
+            questionsReussies.push(qCourante.q);
+            localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
+        }
+        feedback.innerHTML = "✅ CORRECT !<br><small>" + qCourante.r + "</small>";
+        feedback.style.backgroundColor = "#27ae60";
+    } else {
+        feedback.innerHTML = "❌ OUPS...<br><small>Réponse : " + qCourante.r + "</small>";
+        feedback.style.backgroundColor = "#e74c3c";
+    }
+
+    feedback.style.display = "block";
+
+    // Pause de 2.5s pour lire la correction puis question suivante
+    setTimeout(() => {
+        feedback.style.display = "none";
+        indexQuestion++;
+        if (indexQuestion < questionsAffichees.length) {
+            afficherQuestion();
+        } else {
+            terminerQuiz();
+        }
+    }, 2500);
 }
 
 function lancerTimer() {
@@ -431,125 +413,42 @@ function lancerTimer() {
     }, 1000);
 }
 
-function melanger(tableau) {
-    for (let i = tableau.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [tableau[i], tableau[j]] = [tableau[j], tableau[i]];
-    }
-}
-
-function afficherQuestion() {
-    const q = questionsAffichees[indexQuestion];
-    document.getElementById("question").innerText = q.q;
-    document.getElementById("input-reponse").value = "";
-    document.getElementById("progression").innerText = `Question ${indexQuestion + 1} / 20`;
-    document.getElementById("input-reponse").focus();
-    sauvegarderPartie();
-}
-
-function verifierReponse() {
-    const input = document.getElementById("input-reponse");
-    const saisie = input.value.toLowerCase().trim();
-    const qCourante = questionsAffichees[indexQuestion]; 
-    const feedback = document.getElementById("feedback-message");
-
-    const normaliser = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    const saisieNorm = normaliser(saisie);
-
-    const estCorrect = qCourante.a.some(motCle => {
-        const motCleNorm = normaliser(motCle);
-        return saisieNorm.includes(motCleNorm) || motCleNorm.includes(saisieNorm);
-    });
-
-    if (estCorrect && saisieNorm.length >= 3) {
-        score++;
-		if (!questionsReussies.includes(qCourante.q)) { questionsReussies.push(qCourante.q); }
-        feedback.innerHTML = "✅ CORRECT !<br><br><small>" + qCourante.r + "</small>";
-        feedback.style.backgroundColor = "#27ae60"; // Vert émeraude
-    } else {
-        feedback.innerHTML = "❌ OUPS...<br><br><small>Réponse attendue : " + qCourante.r + "</small>";
-        feedback.style.backgroundColor = "#e74c3c"; // Rouge corail
-    }
-
-    feedback.style.display = "block";
-    input.value = ""; 
-
-    // On attend 2.5 secondes pour que l'élève lise, puis on passe à la suite
-    setTimeout(() => {
-        feedback.style.display = "none";
-        prochaineQuestion();
-    }, 2500);
-}
-
-function prochaineQuestion() {
-    indexQuestion++;
-    if (indexQuestion < 20 && indexQuestion < questionsAffichees.length) {
-        afficherQuestion();
-    } else {
-        terminerQuiz();
-    }
-}
-
-// ==========================================
-// SAUVEGARDE & CHARGEMENT
-// ==========================================
-
-function sauvegarderPartie() {
-    localStorage.setItem('quiz_niveau', niveauActuel);
-    localStorage.setItem('quiz_index', indexQuestion);
-    localStorage.setItem('quiz_score', score);
-    localStorage.setItem('quiz_timer', timerGlobal);
-    // On sauve aussi les questions de la session en cours
-    localStorage.setItem('quiz_session', JSON.stringify(questionsAffichees));
-}
-
-function chargerPartie() {
-    niveauActuel = localStorage.getItem('quiz_niveau');
-    indexQuestion = parseInt(localStorage.getItem('quiz_index'));
-    score = parseInt(localStorage.getItem('quiz_score'));
-    timerGlobal = parseInt(localStorage.getItem('quiz_timer'));
-    questionsAffichees = JSON.parse(localStorage.getItem('quiz_session'));
-
-    demarrerInterface();
-}
-
-// ==========================================
-// FIN DE SESSION
-// ==========================================
-
 function terminerQuiz() {
     clearInterval(intervalTimer);
-    localStorage.removeItem('quiz_niveau');
-    localStorage.removeItem('quiz_index');
-	localStorage.removeItem('quiz_score');
-	localStorage.removeItem('quiz_timer');
-
-    const totalNiveau = questions[niveauActuel].length;
-    const nbReussies = questionsReussies.filter(qText => questions[niveauActuel].some(q => q.q === qText)).length;
-    const scoreFinal = `${nbReussies} / ${totalNiveau}`;
-
     const m = Math.floor(timerGlobal / 60);
     const s = timerGlobal % 60;
 
     document.getElementById("jeu").innerHTML = `
-        <div style="padding: 20px;">
-            <h2>🏆 Objectif Atteint !</h2>
-            <p>Niveau <strong>${niveauActuel.toUpperCase()}</strong> terminé.</p>
-            <p style="font-size: 1.4em;">Progression : <span style="color: #27ae60;">${scoreFinal}</span></p>
-            <p>Temps session : ${m}m ${s < 10 ? "0"+s : s}s</p>
+        <div style="padding: 20px; text-align:center;">
+            <h2>🏆 Session terminée !</h2>
+            <p style="font-size: 1.4em;">Score : <span style="color: #27ae60;">${score} / ${questionsAffichees.length}</span></p>
+            <p>Temps : ${m}m ${s < 10 ? "0"+s : s}s</p>
             <hr>
             <button class="btn-niveau" onclick="window.open('https://forms.gle/6LK9Z9YFW3p9jzz87')">Envoyer mes résultats</button>
             <br><br>
             <button onclick="location.reload()" style="background:none; border:1px solid #ccc; padding:10px; border-radius:5px; cursor:pointer;">Retour au menu</button>
         </div>
     `;
-
 }
 
+// ==========================================
+// INITIALISATION & MODAL
+// ==========================================
 
+window.onload = function() {
+    const modal = document.getElementById('welcome-modal');
+    if (!localStorage.getItem('guide_vu')) {
+        modal.style.display = "flex";
+    }
+};
 
-
-
+function fermerModal() {
+    const checkbox = document.getElementById('nePlusAfficher');
+    if (checkbox.checked) {
+        localStorage.setItem('guide_vu', 'true');
+    }
+    document.getElementById('welcome-modal').style.display = "none";
+}
 
 
 
