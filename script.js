@@ -1,8 +1,8 @@
-// ==========================================
+/ ==========================================
 // BASE DE DONNÉES & ÉTAT
 // ==========================================
 let questionsReussies = JSON.parse(localStorage.getItem('quiz_reussies')) || [];
-let questionsAffichees = []; 
+let questionsAffichees = [];
 let niveauActuel = "";
 let indexQuestion = 0;
 let score = 0;
@@ -498,6 +498,7 @@ function terminerQuiz() {
     `;
 
 }
+
 
 
 
