@@ -140,24 +140,29 @@ header h1 {
 
 /* Petit bandeau de notification de reprise */
 .notif-reprise {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #3498db;
-    color: white;
-    padding: 12px 25px;
-    border-radius: 30px;
-    font-weight: bold;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    z-index: 9999; /* Par dessus tout */
-    animation: fadeInOut 3s forwards;
+    position: fixed !important;
+    top: 30px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    background-color: #3498db !important;
+    color: white !important;
+    padding: 15px 30px !important;
+    border-radius: 30px !important;
+    font-weight: bold !important;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3) !important;
+    z-index: 10001 !important; /* Supérieur au modal qui est souvent à 10000 */
+    pointer-events: none;
+    min-width: 280px;
+    text-align: center;
+    display: block !important;
+    animation: apparitionNotif 3s ease-in-out forwards;
 }
 
-@keyframes fadeInOut {
-    0% { opacity: 0; transform: translate(-50%, -20px); }
-    15% { opacity: 1; transform: translate(-50%, 0); }
-    85% { opacity: 1; transform: translate(-50%, 0); }
-    100% { opacity: 0; transform: translate(-50%, -20px); }
+@keyframes apparitionNotif {
+    0% { opacity: 0; top: -50px; }
+    15% { opacity: 1; top: 30px; }
+    85% { opacity: 1; top: 30px; }
+    100% { opacity: 0; top: -50px; }
 }
+
 
