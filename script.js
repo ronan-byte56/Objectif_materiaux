@@ -308,23 +308,27 @@ premiere: [
   ]
 };
 // ==========================================
-// 3. FONCTIONS
+// 3. LOGIQUE DU JEU
 // ==========================================
 
 function choisirNiveau(niveau) {
     niveauActuel = niveau;
+    
+    // Filtre pour ne pas proposer les questions déjà réussies
     let dispos = questions[niveau].filter(q => !questionsReussies.includes(q.q));
 
     if (dispos.length === 0) {
-        if (confirm("Niveau terminé ! Recommencer ?")) {
+        if (confirm("Félicitations ! Tu as tout validé dans ce niveau. Recommencer ?")) {
             questionsReussies = questionsReussies.filter(qText => !questions[niveau].some(q => q.q === qText));
             localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
             dispos = questions[niveau];
-        } else return;
+        } else { return; }
     }
 
+    // Mélange aléatoire
     dispos.sort(() => Math.random() - 0.5);
-    questionsAffichees = dispos.slice(0, 20);
+    questionsAffichees = dispos.slice(0, 20); // 20 questions max par session
+    
     indexQuestion = 0;
     score = 0;
     timerGlobal = 0;
@@ -350,9 +354,13 @@ function verifierReponse() {
     const saisie = input.value.toLowerCase().trim();
     const q = questionsAffichees[indexQuestion];
 
-    const estCorrect = q.a.some(mot => saisie.includes(mot.toLowerCase()));
+    // Normalisation pour ignorer les accents
+    const norm = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const saisieNorm = norm(saisie);
 
-    if (estCorrect && saisie.length > 1) {
+    const estCorrect = q.a.some(mot => norm(mot).includes(saisieNorm) || saisieNorm.includes(norm(mot)));
+
+    if (estCorrect && saisieNorm.length >= 2) {
         score++;
         if (!questionsReussies.includes(q.q)) {
             questionsReussies.push(q.q);
@@ -366,26 +374,53 @@ function verifierReponse() {
     }
 
     feedback.style.display = "block";
+
     setTimeout(() => {
         feedback.style.display = "none";
-        indexQuestion++;
-        if (indexQuestion < questionsAffichees.length) afficherQuestion();
-        else terminerQuiz();
+        prochaineQuestion();
     }, 2500);
+}
+
+function prochaineQuestion() {
+    indexQuestion++;
+    if (indexQuestion < questionsAffichees.length) {
+        afficherQuestion();
+    } else {
+        terminerQuiz();
+    }
 }
 
 function lancerTimer() {
     if (intervalTimer) clearInterval(intervalTimer);
     intervalTimer = setInterval(() => {
         timerGlobal++;
-        document.getElementById("timer").innerText = `Temps : ${timerGlobal}s`;
+        const m = Math.floor(timerGlobal / 60);
+        const s = timerGlobal % 60;
+        document.getElementById("timer").innerText = `Temps : ${m}m ${s < 10 ? "0"+s : s}s`;
     }, 1000);
 }
 
 function terminerQuiz() {
     clearInterval(intervalTimer);
-    document.getElementById("jeu").innerHTML = `<h2>🏆 Fini ! Score : ${score}/${questionsAffichees.length}</h2><button onclick="location.reload()">Retour</button>`;
+    const m = Math.floor(timerGlobal / 60);
+    const s = timerGlobal % 60;
+
+    document.getElementById("jeu").innerHTML = `
+        <div style="padding: 20px; text-align:center;">
+            <h2>🏆 Session terminée !</h2>
+            <p style="font-size: 1.4em;">Score : <span style="color: #27ae60;">${score} / ${questionsAffichees.length}</span></p>
+            <p>Temps : ${m}m ${s < 10 ? "0"+s : s}s</p>
+            <hr>
+            <button class="btn-niveau" onclick="window.open('https://forms.gle/6LK9Z9YFW3p9jzz87')">Envoyer mes résultats</button>
+            <br><br>
+            <button onclick="location.reload()" style="background:none; border:1px solid #ccc; padding:10px; border-radius:5px; cursor:pointer;">Retour au menu</button>
+        </div>
+    `;
 }
+
+// ==========================================
+// 4. INITIALISATION
+// ==========================================
 
 window.onload = function() {
     if (!localStorage.getItem('guide_vu')) {
@@ -394,13 +429,11 @@ window.onload = function() {
 };
 
 function fermerModal() {
-    if (document.getElementById('nePlusAfficher').checked) localStorage.setItem('guide_vu', 'true');
+    if (document.getElementById('nePlusAfficher').checked) {
+        localStorage.setItem('guide_vu', 'true');
+    }
     document.getElementById('welcome-modal').style.display = "none";
 }
-
-
-
-
 
 
 
