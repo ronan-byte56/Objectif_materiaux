@@ -535,6 +535,8 @@ function terminerQuiz() {
     clearInterval(intervalTimer);
     localStorage.removeItem('quiz_niveau');
     localStorage.removeItem('quiz_index');
+	localStorage.removeItem('quiz_score');
+	localStorage.removeItem('quiz_timer');
 
     const totalNiveau = questions[niveauActuel].length;
     const nbReussies = questionsReussies.filter(qText => questions[niveauActuel].some(q => q.q === qText)).length;
@@ -557,5 +559,6 @@ function terminerQuiz() {
     `;
 
 }
+
 
 
