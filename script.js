@@ -8,7 +8,7 @@ let indexQuestion = 0;
 let score = 0;
 let timerGlobal = 0;
 let intervalTimer;
-let peutValider = true; // Cette variable servira de verrou
+let peutValider = true;
 
 // ==========================================
 // 2. BASE DE DONNÉES
@@ -552,11 +552,13 @@ document.addEventListener('keypress', (e) => {
     }
 });
 
-
-
-
-
-
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('PWA enregistrée !'))
+      .catch(err => console.log('Erreur PWA :', err));
+  });
+}
 
 
 
