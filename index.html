@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objectif Matériaux</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Objectif Matériaux</h1>
+
+<div id="welcome-modal" class="modal">
+    <div class="modal-content">
+        <h2 style="color: #27ae60;">📖 Guide de Survie : Le Quiz "Objectif Matériaux"</h2>
+        <p><i>Pour obtenir ton 20/20 et valider tes acquis, suis ces quelques conseils :</i></p>
+        
+        <ul class="guide-list">
+            <li>🎯 <b>Vise les mots-clés :</b> L'application cherche l'idée principale. Pas besoin de faire des phrases complètes. Tape <b>"lunettes"</b> plutôt que "Je dois mettre mes lunettes de sécurité".</li>
+            <li>✨ <b>L'orthographe (presque) libre :</b> Ton prof a rendu l'IA sympa ! Elle accepte souvent les mots même s'il manque un "s" ou si tu oublies un accent.</li>
+            <li>🔤 <b>Mots courts autorisés :</b> Pour certaines questions complexes, les sigles fonctionnent (ex: <b>"EPI", "PP", "PVC"</b>).</li>
+            <li>🎒 <b>Pas de panique en cas d'erreur :</b> Si tu te trompes, l'application te donne la réponse et remet la question dans ton sac pour plus tard. Elle ne disparaîtra que quand tu l'auras réussie !</li>
+            <li>🔋 <b>Sauvegarde automatique :</b> Si tu fermes l'onglet, le jeu se souviendra de ton score. Tu pourras reprendre là où tu t'es arrêté.</li>
+        </ul>
+
+        <button class="btn-niveau" onclick="fermerModal()">J'ai compris, c'est parti !</button>
+        
+        <div style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
+            <input type="checkbox" id="ne-plus-montrer"> 
+            <label for="ne-plus-montrer" style="font-size: 0.85em; color: #666;">Ne plus afficher ce guide au démarrage</label>
+        </div>
+    </div>
+</div>
+
+        <div id="selection-niveau">
+            <p>Choisis ton niveau :</p>
+            <button class="btn-niveau" onclick="choisirNiveau('seconde')">Seconde</button>
+            <button class="btn-niveau" onclick="choisirNiveau('premiere')">Première</button>
+            <button class="btn-niveau" onclick="choisirNiveau('terminale')">Terminale</button>
+        </div>
+
+        <div id="jeu" style="display:none;">
+            <div class="stats-bar">
+                <span id="timer">Temps : 0m 0s</span>
+                <span id="progression">Question 1 / 100</span>
+            </div>
+            
+            <div class="card">
+                <p id="question"></p>
+                <input type="text" id="input-reponse" placeholder="Tape ta réponse..." autocomplete="off">
+                <button id="btn-valider" onclick="verifierReponse()">Valider</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
