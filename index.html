@@ -10,33 +10,51 @@
 
     <div id="welcome-modal" class="modal">
         <div class="modal-content">
-            <h2>Bienvenue au Quiz ! 🛠️</h2>
-            <p>Réponds aux questions en utilisant des mots-clés simples.</p>
-            <label><input type="checkbox" id="nePlusAfficher"> Ne plus afficher ce message</label>
-            <button onclick="fermerModal()">C'est parti !</button>
+            <h2>Bienvenue sur l'App de Révision ! 🛠️</h2>
+            <div class="guide-section">
+                <p><strong>Comment jouer ?</strong></p>
+                <ul>
+                    <li>Choisis ton niveau (2nde, 1ère, Term).</li>
+                    <li>Réponds par <strong>mots-clés</strong> (ex: pour "EPI", tape "protection").</li>
+                    <li>Le jeu se souvient des questions réussies !</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <label>
+                    <input type="checkbox" id="nePlusAfficher"> Ne plus afficher ce guide
+                </label>
+                <button class="btn-niveau" onclick="fermerModal()">C'est parti !</button>
+            </div>
         </div>
     </div>
 
     <div class="container">
-        <div id="selection-niveau">
-            <h1>Choisissez votre niveau</h1>
-            <button class="btn-niveau" onclick="choisirNiveau('seconde')">Seconde</button>
-            <button class="btn-niveau" onclick="choisirNiveau('premiere')">Première</button>
-            <button class="btn-niveau" onclick="choisirNiveau('terminale')">Terminale</button>
+        <div id="selection-niveau" class="menu-card">
+            <h1>🎓 Quiz Plasturgie</h1>
+            <p>Sélectionnez votre niveau pour commencer</p>
+            <div class="button-group">
+                <button class="btn-niveau" onclick="choisirNiveau('seconde')">Seconde</button>
+                <button class="btn-niveau" onclick="choisirNiveau('premiere')">Première</button>
+                <button class="btn-niveau" onclick="choisirNiveau('terminale')">Terminale</button>
+            </div>
         </div>
 
-        <div id="jeu" style="display:none;">
+        <div id="jeu" style="display:none;" class="quiz-card">
             <div class="header-quiz">
-                <span id="timer">Temps : 00s</span>
-                <span id="progression">Question 1 / 20</span>
+                <div id="timer" class="stat-badge">Temps : 0m 00s</div>
+                <div id="progression" class="stat-badge">Question 1 / 20</div>
             </div>
             
-            <h2 id="question">Chargement de la question...</h2>
+            <div class="question-container">
+                <h2 id="question">Préparation de la question...</h2>
+            </div>
             
-            <input type="text" id="input-reponse" placeholder="Votre réponse ici..." autocomplete="off">
-            <button class="btn-valider" onclick="verifierReponse()">Valider</button>
+            <div class="input-container">
+                <input type="text" id="input-reponse" placeholder="Tapez votre réponse ici..." autocomplete="off">
+                <button class="btn-valider" onclick="verifierReponse()">Valider</button>
+            </div>
 
-            <div id="feedback-message" style="display:none;"></div>
+            <div id="feedback-message" class="feedback" style="display:none;"></div>
         </div>
     </div>
 
