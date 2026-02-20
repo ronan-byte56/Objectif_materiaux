@@ -313,19 +313,25 @@ premiere: [
 function choisirNiveau(niveau) {
     niveauActuel = niveau;
     
-    // On mélange les questions du niveau choisi
-    melanger(questions[niveauActuel]);
+    // On ne garde que les questions dont l'énoncé (q) n'est pas dans questionsReussies
+    let questionsDisponibles = questions[niveauActuel].filter(q => !questionsReussies.includes(q.q));
+
+    // Si tout est réussi, on propose de recommencer le niveau à zéro
+    if (questionsDisponibles.length === 0) {
+        if (confirm("Félicitations ! Tu as validé toutes les questions. Veux-tu recommencer ce niveau ?")) {
+            questionsReussies = questionsReussies.filter(qText => !questions[niveauActuel].some(q => q.q === qText));
+            localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
+            questionsDisponibles = questions[niveauActuel];
+        } else { return; }
+    }
+
+    melanger(questionsDisponibles);
+    questionsAffichees = questionsDisponibles.slice(0, 20); // Ta session de 20
     
-    // Optionnel : si tu veux vraiment limiter la base à 20 pour cette session :
-    // questions[niveauActuel] = questions[niveauActuel].slice(0, 20);
-
     indexQuestion = 0;
-    score = 0;
-    timerGlobal = 0;
-
+    score = parseInt(localStorage.getItem('quiz_score')) || 0;
     document.getElementById("selection-niveau").style.display = "none";
     document.getElementById("jeu").style.display = "block";
-    
     lancerTimer();
     afficherQuestion();
 }
@@ -358,18 +364,23 @@ function afficherQuestion() {
 
 function verifierReponse() {
     const saisie = document.getElementById("input-reponse").value.toLowerCase().trim();
-    const q = questions[niveauActuel][indexQuestion];
-
-    // Fonction pour enlever les accents et faciliter la correction
+    // On utilise bien questionsAffichees qui contient tes 20 questions du moment
+    const qCourante = questionsAffichees[indexQuestion]; 
+    
     const normaliser = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-
-    const estCorrect = q.a.some(motCle => normaliser(saisie).includes(normaliser(motCle)));
+    const estCorrect = qCourante.a.some(motCle => normaliser(saisie).includes(normaliser(motCle)));
 
     if (estCorrect) {
         score++;
-        alert("✅ CORRECT !\n" + q.r);
+        // On bloque la question pour qu'elle ne revienne plus jamais
+        if (!questionsReussies.includes(qCourante.q)) {
+            questionsReussies.push(qCourante.q);
+            localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
+        }
+        alert("✅ CORRECT !\n" + qCourante.r);
     } else {
-        alert("❌ DOMMAGE...\nLa réponse attendue était : " + q.r);
+        // La question n'est pas ajoutée à questionsReussies, elle reviendra donc
+        alert("❌ DOMMAGE...\nLa question reviendra plus tard.\nRéponse attendue : " + qCourante.r);
     }
 
     prochaineQuestion();
@@ -409,6 +420,7 @@ function sauvegarderPartie() {
 
 function chargerPartie() {
     niveauActuel = localStorage.getItem('quiz_niveau');
+    questionsAffichees = questions[niveauActuel];   
     indexQuestion = parseInt(localStorage.getItem('quiz_index'));
     score = parseInt(localStorage.getItem('quiz_score'));
     timerGlobal = parseInt(localStorage.getItem('quiz_timer'));
@@ -426,22 +438,25 @@ function chargerPartie() {
 
 function terminerQuiz() {
     clearInterval(intervalTimer);
-    localStorage.clear(); // On vide la mémoire car le quiz est fini
+    localStorage.clear(); // On vide le timer et l'index en cours, mais PAS les réussites
 
-    const scoreFinal = `${score} / ${questions[niveauActuel].length}`;
+    // On calcule combien de questions du niveau actuel sont dans la liste des réussites
+    const totalNiveau = questions[niveauActuel].length;
+    const nbReussies = questionsReussies.filter(qText => questions[niveauActuel].some(q => q.q === qText)).length;
+    
+    const scoreFinal = `${nbReussies} / ${totalNiveau}`;
     const m = Math.floor(timerGlobal / 60);
     const s = timerGlobal % 60;
-    const tempsFinal = `${m}m ${s}s`;
+    const tempsFinal = `${m}m ${s < 10 ? "0"+s : s}s`;
 
     document.getElementById("jeu").innerHTML = `
         <div style="padding: 20px;">
             <h2>🏆 Objectif Atteint !</h2>
-            <p>Tu as terminé le niveau <strong>${niveauActuel.toUpperCase()}</strong>.</p>
-            <p style="font-size: 1.4em;">Score : <span style="color: #27ae60;">${scoreFinal}</span></p>
-            <p>Temps total : ${tempsFinal}</p>
+            <p>Niveau : <strong>${niveauActuel.toUpperCase()}</strong></p>
+            <p style="font-size: 1.4em;">Progression totale : <span style="color: #27ae60;">${scoreFinal}</span></p>
+            <p>Temps session : ${tempsFinal}</p>
             <hr>
-            <p>Note tes résultats et clique ci-dessous pour les transmettre :</p>
-            onclick="alert('Pense à bien noter ton score : ' + scoreFinal); window.open('https://docs.google.com/forms/d/e/1FAIpQLSfy5HUrBNtcs3FLqFCtItBDltysWo8aMYhXyHxS_Tj49pRKSA/viewform', '_blank')"
+            <button class="btn-niveau" onclick="window.open('https://forms.gle/6LK9Z9YFW3p9jzz87')">
                 Envoyer mes résultats
             </button>
             <br><br>
@@ -452,6 +467,7 @@ function terminerQuiz() {
     `;
 }
 });
+
 
 
 
