@@ -69,7 +69,7 @@ const questions = {
         { q: "MATÉRIAUX : Pourquoi sèche-t-on certaines matières avant usage ?", a: ["humidite", "eau", "defaut", "bulles", "etuve"], r: "Pour enlever l'humidité qui crée des défauts." },
         { q: "MATÉRIAUX : Qu'est-ce qu'un additif ?", a: ["ameliorer", "ajouter", "plus", "uv", "aide"], r: "Un produit ajouté pour améliorer une propriété (ex: anti-UV)." }
     ]
-};
+],
 premiere: [
         // --- INJECTION PLASTURGIE ---
         { q: "INJECTION : Comment appelle-t-on la vis qui pousse la matière ?", a: ["vis", "plastification", "vis d'injection", "vis de plastification"], r: "La vis de plastification." },
@@ -500,6 +500,7 @@ function terminerQuiz() {
     `;
 
 }
+
 
 
 
