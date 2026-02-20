@@ -422,7 +422,7 @@ function terminerQuiz() {
             <p>Temps total : ${tempsFinal}</p>
             <hr>
             <p>Note tes résultats et clique ci-dessous pour les transmettre :</p>
-            <button class="btn-niveau" onclick="window.open('https://forms.gle/m3MUyvHDC1Qh2a4HA')">
+            onclick="alert('Pense à bien noter ton score : ' + scoreFinal); window.open('https://docs.google.com/forms/d/e/1FAIpQLSfy5HUrBNtcs3FLqFCtItBDltysWo8aMYhXyHxS_Tj49pRKSA/viewform', '_blank')"
                 Envoyer mes résultats
             </button>
             <br><br>
@@ -433,6 +433,7 @@ function terminerQuiz() {
     `;
 }
 });
+
 
 
 
