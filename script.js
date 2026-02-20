@@ -314,23 +314,32 @@ premiere: [
 function choisirNiveau(niveau) {
     niveauActuel = niveau;
     
-    // On récupère les questions pas encore réussies
-    let dispos = questions[niveau].filter(q => !questionsReussies.includes(q.q));
+    // VERIFICATION : Existe-t-il une session sauvegardée pour ce niveau ?
+    const sauvegarde = JSON.parse(localStorage.getItem('quiz_encours'));
 
-    // Si tout est fini, on réinitialise sans demander
-    if (dispos.length === 0) {
-        questionsReussies = questionsReussies.filter(qText => !questions[niveau].some(q => q.q === qText));
-        localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
-        dispos = questions[niveau];
+    if (sauvegarde && sauvegarde.niveau === niveau) {
+        // ON REPREND LA SESSION
+        questionsAffichees = sauvegarde.questions;
+        indexQuestion = sauvegarde.index;
+        score = sauvegarde.score;
+        timerGlobal = sauvegarde.timer;
+    } else {
+        // NOUVELLE SESSION : On filtre les questions jamais réussies
+        let dispos = questions[niveau].filter(q => !questionsReussies.includes(q.q));
+
+        if (dispos.length === 0) {
+            // Si tout est fini, on reset le niveau pour recommencer
+            questionsReussies = questionsReussies.filter(qText => !questions[niveau].some(q => q.q === qText));
+            localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
+            dispos = questions[niveau];
+        }
+
+        dispos.sort(() => Math.random() - 0.5);
+        questionsAffichees = dispos.slice(0, 20);
+        indexQuestion = 0;
+        score = 0;
+        timerGlobal = 0;
     }
-
-    // Mélange et sélection des 20 questions
-    dispos.sort(() => Math.random() - 0.5);
-    questionsAffichees = dispos.slice(0, 20);
-    
-    indexQuestion = 0;
-    score = 0;
-    timerGlobal = 0;
 
     document.getElementById("selection-niveau").style.display = "none";
     document.getElementById("jeu").style.display = "block";
@@ -339,12 +348,27 @@ function choisirNiveau(niveau) {
     afficherQuestion();
 }
 
+function sauvegarderSession() {
+    const etat = {
+        niveau: niveauActuel,
+        questions: questionsAffichees,
+        index: indexQuestion,
+        score: score,
+        timer: timerGlobal
+    };
+    localStorage.setItem('quiz_encours', JSON.stringify(etat));
+}
+
 function afficherQuestion() {
     // S'assure qu'il y a des questions à afficher
     if (indexQuestion >= questionsAffichees.length) {
         terminerQuiz();
         return;
     }
+    
+    // ON SAUVEGARDE avant d'afficher pour mémoriser l'index
+    sauvegarderSession();
+
     const q = questionsAffichees[indexQuestion];
     document.getElementById("question").innerText = q.q;
     document.getElementById("input-reponse").value = "";
@@ -356,57 +380,62 @@ function verifierReponse() {
     const input = document.getElementById("input-reponse");
     const feedback = document.getElementById("feedback-message");
     const saisie = input.value.toLowerCase().trim();
+    if (!saisie) return; // Évite de valider du vide
+
     const q = questionsAffichees[indexQuestion];
 
-    // Normalisation pour ignorer les accents et la casse
     const norm = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     const saisieNorm = norm(saisie);
 
-    // Vérifie si l'un des mots-clés est présent dans la réponse normalisée
     const estCorrect = q.a.some(mot => saisieNorm.includes(norm(mot)) || norm(mot).includes(saisieNorm));
 
-    if (estCorrect && saisieNorm.length >= 2) { // Réponse considérée correcte si au moins 2 caractères
+    if (estCorrect && saisieNorm.length >= 2) {
         score++;
-        // Ajoute la question à la liste des réussies si elle n'y est pas déjà
         if (!questionsReussies.includes(q.q)) { 
             questionsReussies.push(q.q);
             localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
         }
-        feedback.className = "feedback correct"; // Applique la classe CSS pour le vert
+        feedback.className = "feedback correct";
         feedback.innerHTML = "✅ BIEN JOUÉ !<br><small>" + q.r + "</small>";
     } else {
-        feedback.className = "feedback erreur"; // Applique la classe CSS pour le rouge
+        feedback.className = "feedback erreur";
         feedback.innerHTML = "❌ PAS TOUT À FAIT...<br><small>Réponse attendue : " + q.r + "</small>";
     }
 
-    feedback.style.display = "block"; // Affiche le feedback
+    feedback.style.display = "block";
     
-    // Attend 2.8 secondes avant de passer à la question suivante
+    // On sauvegarde le score mis à jour avant de passer à la suite
+    sauvegarderSession();
+
     setTimeout(() => {
         feedback.style.display = "none";
-        indexQuestion++; // Passe à la question suivante
+        indexQuestion++;
         if (indexQuestion < questionsAffichees.length) {
-            afficherQuestion(); // Affiche la nouvelle question
+            afficherQuestion();
         } else {
-            terminerQuiz(); // Termine le quiz si toutes les questions sont passées
+            terminerQuiz();
         }
     }, 2800);
 }
 
 function lancerTimer() {
-    if (intervalTimer) clearInterval(intervalTimer); // Empêche plusieurs timers de tourner
+    if (intervalTimer) clearInterval(intervalTimer);
     intervalTimer = setInterval(() => {
         timerGlobal++;
-        const m = Math.floor(timerGlobal / 60); // Minutes
-        const s = timerGlobal % 60; // Secondes
+        const m = Math.floor(timerGlobal / 60);
+        const s = timerGlobal % 60;
         document.getElementById("timer").innerText = `Temps : ${m}m ${s < 10 ? "0" + s : s}s`;
-    }, 1000); // Met à jour toutes les secondes
+        
+        // On sauvegarde le timer régulièrement (toutes les 5 secondes)
+        if (timerGlobal % 5 === 0) sauvegarderSession();
+    }, 1000);
 }
 
 function terminerQuiz() {
-    clearInterval(intervalTimer); // Arrête le timer
-    
-    // Calcule la progression totale du niveau
+    clearInterval(intervalTimer);
+    // SUPPRESSION DE LA SESSION : On nettoie car le quiz est fini
+    localStorage.removeItem('quiz_encours');
+
     const totalNiveau = questions[niveauActuel].length;
     const nbReussies = questionsReussies.filter(qText => questions[niveauActuel].some(q => q.q === qText)).length;
     const progressionNiveau = `${nbReussies} / ${totalNiveau}`;
@@ -414,7 +443,6 @@ function terminerQuiz() {
     const m = Math.floor(timerGlobal / 60);
     const s = timerGlobal % 60;
 
-    // Affiche l'écran de fin de quiz
     document.getElementById("jeu").innerHTML = `
         <div class="card" style="text-align:center;">
             <h2>🏆 OBJECTIF ATTEINT !</h2>
@@ -434,17 +462,15 @@ function terminerQuiz() {
 // 4. INITIALISATION (MODAL DE BIENVENUE)
 // ==========================================
 
-// Affiche le modal au chargement si l'utilisateur ne l'a pas masqué
 window.onload = function() {
     if (!localStorage.getItem('guide_vu')) {
         document.getElementById('welcome-modal').style.display = "flex";
     }
 };
 
-// Fonction pour fermer le modal
 function fermerModal() {
     if (document.getElementById('nePlusAfficher').checked) {
-        localStorage.setItem('guide_vu', 'true'); // Enregistre que le guide a été vu
+        localStorage.setItem('guide_vu', 'true');
     }
     document.getElementById('welcome-modal').style.display = "none";
 }
@@ -453,14 +479,11 @@ function fermerModal() {
 // 5. GESTION DES ÉVÉNEMENTS CLAVIER
 // ==========================================
 
-// Permet de valider la réponse en appuyant sur "Entrée"
 document.addEventListener('keypress', (e) => {
-    // Vérifie si la touche est "Entrée" et si l'écran de jeu est visible
     if (e.key === 'Enter' && document.getElementById('jeu').style.display !== 'none') {
-        verifierReponse(); // Appelle la fonction de vérification
+        verifierReponse();
     }
 });
-
 
 
 
