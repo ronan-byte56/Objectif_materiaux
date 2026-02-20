@@ -94,11 +94,19 @@ header h1 {
 }
 
 .modal-content {
-    background: white;
-    padding: 35px;
+    background-color: #fefefe;
+    margin: 5% auto; /* Réduit la marge haute pour gagner de la place */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%; /* Largeur fluide */
+    max-width: 500px;
     border-radius: 15px;
-    max-width: 550px;
-    text-align: left;
+    
+    /* LES LIGNES MAGIQUES CI-DESSOUS */
+    max-height: 85vh; /* Ne dépasse jamais 85% de la hauteur de l'écran */
+    overflow-y: auto; /* Permet de scroller À L'INTÉRIEUR du popup si le texte est trop long */
+    position: relative;
+    -webkit-overflow-scrolling: touch; /* Fluidité du scroll spécifique aux iPhone */
 }
 
 .guide-item {
@@ -157,6 +165,7 @@ header h1 {
     85% { opacity: 1; top: 30px; }
     100% { opacity: 0; top: -50px; }
 }
+
 
 
 
