@@ -150,7 +150,7 @@ header h1 {
     border-radius: 30px;
     font-weight: bold;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    z-index: 2000; /* Par dessus tout */
+    z-index: 9999; /* Par dessus tout */
     animation: fadeInOut 3s forwards;
 }
 
@@ -160,3 +160,4 @@ header h1 {
     85% { opacity: 1; transform: translate(-50%, 0); }
     100% { opacity: 0; transform: translate(-50%, -20px); }
 }
+
