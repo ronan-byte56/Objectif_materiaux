@@ -3,12 +3,16 @@
 // ==========================================
 let questionsReussies = JSON.parse(localStorage.getItem('quiz_reussies')) || [];
 let questionsAffichees = [];
-let niveauActuel = ""; // Ajout pour le suivi du niveau
+let niveauActuel = ""; 
 let indexQuestion = 0;
 let score = 0;
 let timerGlobal = 0;
 let intervalTimer;
 let peutValider = true;
+
+// NOUVEAU : Récupération de l'identité
+let prenom = localStorage.getItem('user_prenom') || "";
+let nom = localStorage.getItem('user_nom') || "";
 
 // ==========================================
 // 2. BASE DE DONNÉES
@@ -343,24 +347,52 @@ premiere: [
 // 3. LOGIQUE DU JEU
 // ==========================================
 
+// NOUVELLE FONCTION : Validation Identité
+function validerEtFermer() {
+    const p = document.getElementById("user-prenom").value.trim();
+    const n = document.getElementById("user-nom").value.trim();
+
+    if (p === "" || n === "") {
+        alert("Pense à remplir ton nom et ton prénom pour que je puisse te reconnaître !");
+        return;
+    }
+
+    // Sauvegarde
+    localStorage.setItem('user_prenom', p);
+    localStorage.setItem('user_nom', n);
+    prenom = p;
+    nom = n;
+
+    // Gestion du "Ne plus afficher"
+    if (document.getElementById('nePlusAfficher').checked) {
+        localStorage.setItem('guide_vu', 'true');
+    }
+    
+    document.getElementById('welcome-modal').style.display = "none";
+    
+    // Si une partie est en cours, on affiche la notif personnalisée
+    if (localStorage.getItem('quiz_encours')) {
+        afficherNotifReprise();
+    }
+
+    if (document.getElementById('jeu').style.display !== 'none') {
+        document.getElementById('input-reponse').focus();
+    }
+}
+
 function choisirNiveau(niveau) {
     niveauActuel = niveau;
-    
-    // VERIFICATION : Existe-t-il une session sauvegardée pour ce niveau ?
     const sauvegarde = JSON.parse(localStorage.getItem('quiz_encours'));
 
     if (sauvegarde && sauvegarde.niveau === niveau) {
-        // ON REPREND LA SESSION
         questionsAffichees = sauvegarde.questions;
         indexQuestion = sauvegarde.index;
         score = sauvegarde.score;
         timerGlobal = sauvegarde.timer;
     } else {
-        // NOUVELLE SESSION : On filtre les questions jamais réussies
         let dispos = questions[niveau].filter(q => !questionsReussies.includes(q.q));
 
         if (dispos.length === 0) {
-            // Si tout est fini, on reset le niveau pour recommencer
             questionsReussies = questionsReussies.filter(qText => !questions[niveau].some(q => q.q === qText));
             localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
             dispos = questions[niveau];
@@ -392,15 +424,11 @@ function sauvegarderSession() {
 }
 
 function afficherQuestion() {
-    // S'assure qu'il y a des questions à afficher
     if (indexQuestion >= questionsAffichees.length) {
         terminerQuiz();
         return;
     }
-    
-    // ON SAUVEGARDE avant d'afficher pour mémoriser l'index
     sauvegarderSession();
-
     const q = questionsAffichees[indexQuestion];
     document.getElementById("question").innerText = q.q;
     document.getElementById("input-reponse").value = "";
@@ -410,17 +438,12 @@ function afficherQuestion() {
 
 function verifierReponse() {
     if (!peutValider) return;
-
     const input = document.getElementById("input-reponse");
     const feedback = document.getElementById("feedback-message");
     const saisie = input.value.toLowerCase().trim();
-    
-    // On vérifie d'abord s'il y a une réponse
     if (!saisie) return; 
 
-    // SI OK, ON FERME LE VERROU ICI
     peutValider = false; 
-
     const q = questionsAffichees[indexQuestion];
     const norm = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     const saisieNorm = norm(saisie);
@@ -433,7 +456,7 @@ function verifierReponse() {
             localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
         }
         feedback.className = "feedback correct";
-        feedback.innerHTML = "✅ BIEN JOUÉ !<br><small>" + q.r + "</small>";
+        feedback.innerHTML = "✅ BIEN JOUÉ " + prenom.toUpperCase() + " !<br><small>" + q.r + "</small>";
     } else {
         feedback.className = "feedback erreur";
         feedback.innerHTML = "❌ PAS TOUT À FAIT...<br><small>Réponse attendue : " + q.r + "</small>";
@@ -447,7 +470,7 @@ function verifierReponse() {
         indexQuestion++;
         if (indexQuestion < questionsAffichees.length) {
             afficherQuestion();
-            peutValider = true; // RÉOUVERTURE DU VERROU
+            peutValider = true;
         } else {
             terminerQuiz();
         }
@@ -461,37 +484,40 @@ function lancerTimer() {
         const m = Math.floor(timerGlobal / 60);
         const s = timerGlobal % 60;
         document.getElementById("timer").innerText = `Temps : ${m}m ${s < 10 ? "0" + s : s}s`;
-        
-        // On sauvegarde le timer régulièrement (toutes les 5 secondes)
         if (timerGlobal % 5 === 0) sauvegarderSession();
     }, 1000);
 }
 
 function terminerQuiz() {
     clearInterval(intervalTimer);
-    // SUPPRESSION DE LA SESSION : On nettoie car le quiz est fini
     localStorage.removeItem('quiz_encours');
 
     const totalNiveau = questions[niveauActuel].length;
     const nbReussies = questionsReussies.filter(qText => questions[niveauActuel].some(q => q.q === qText)).length;
     const progressionNiveau = `${nbReussies} / ${totalNiveau}`;
-
     const m = Math.floor(timerGlobal / 60);
     const s = timerGlobal % 60;
 
+    // Ici on affiche le bouton d'envoi automatique (on le lie à Google Forms pour l'instant)
     document.getElementById("jeu").innerHTML = `
         <div class="card" style="text-align:center;">
-            <h2>🏆 OBJECTIF ATTEINT !</h2>
+            <h2>🏆 OBJECTIF ATTEINT ${prenom.toUpperCase()} !</h2>
             <p style="font-size: 1.4em; color: #3498db;">Niveau <strong>${niveauActuel.toUpperCase()}</strong> terminé.</p>
             <p style="font-size: 1.2em;">Score de la session : <span style="color: #2ecc71;">${score} / ${questionsAffichees.length}</span></p>
             <p>Progression totale du niveau : <span style="color: #2ecc71;">${progressionNiveau}</span></p>
-            <p>Temps total de la session : ${m}m ${s < 10 ? "0"+s : s}s</p>
+            <p>Temps : ${m}m ${s < 10 ? "0"+s : s}s</p>
             <hr style="margin: 25px auto; border-color: #eee;">
-            <button class="btn-go" onclick="window.open('https://forms.gle/6LK9Z9YFW3p9jzz87', '_blank')">Envoyer mes résultats (Google Forms)</button>
+            <button class="btn-go" onclick="envoyerResultats()">🚀 Envoyer mes résultats au prof</button>
             <br><br>
-            <button class="btn-lvl" onclick="location.reload()" style="background:none; color:#555; border:1px solid #ccc;">Retour au menu principal</button>
+            <button class="btn-lvl" onclick="location.reload()" style="background:none; color:#555; border:1px solid #ccc;">Retour au menu</button>
         </div>
     `;
+}
+
+// NOUVEAU : Fonction pour l'envoi auto (préparation)
+function envoyerResultats() {
+    alert(`Bravo ${prenom} ! Tes résultats (${score}/20 en ${niveauActuel}) sont prêts à être envoyés. (Prochaine étape : connexion Google Sheets)`);
+    // C'est ici qu'on mettra le script d'envoi auto vers Google Sheets/Notion
 }
 
 // ==========================================
@@ -501,47 +527,31 @@ function terminerQuiz() {
 window.onload = function() {
     const sauvegarde = JSON.parse(localStorage.getItem('quiz_encours'));
 
-    // Si une session existe, on la prépare
+    // Remplissage automatique si déjà connu
+    if (prenom) document.getElementById('user-prenom').value = prenom;
+    if (nom) document.getElementById('user-nom').value = nom;
+
     if (sauvegarde && sauvegarde.niveau) {
         choisirNiveau(sauvegarde.niveau);
     }
 
-    // Gestion du Guide
     if (!localStorage.getItem('guide_vu')) {
         document.getElementById('welcome-modal').style.display = "flex";
     } else {
-        // Si le guide n'est pas là, on peut afficher la notif de suite
         if (sauvegarde) { afficherNotifReprise(); }
     }
 };
 
-function fermerModal() {
-    if (document.getElementById('nePlusAfficher').checked) {
-        localStorage.setItem('guide_vu', 'true');
-    }
-    document.getElementById('welcome-modal').style.display = "none";
-    
-    // Si on est en train de reprendre une partie, on lance la notif au moment où le guide part
-    if (localStorage.getItem('quiz_encours')) {
-        afficherNotifReprise();
-    }
-
-    if (document.getElementById('jeu').style.display !== 'none') {
-        document.getElementById('input-reponse').focus();
-    }
-}
-
 function afficherNotifReprise() {
     const notif = document.getElementById('notif-reprise');
     if (notif) {
-        notif.style.display = 'block'; // On l'affiche
-
-        // On le cache automatiquement après 4 secondes
-        setTimeout(() => {
-            notif.style.display = 'none';
-        }, 4000);
+        // AFFIRMATION PERSONNALISÉE
+        notif.innerHTML = `🚀 Ravi de te revoir ${prenom}, on reprend ton entraînement !`;
+        notif.style.display = 'block';
+        setTimeout(() => { notif.style.display = 'none'; }, 5000);
     }
 }
+
 // ==========================================
 // 5. GESTION DES ÉVÉNEMENTS CLAVIER
 // ==========================================
@@ -559,6 +569,7 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.log('Erreur PWA :', err));
   });
 }
+
 
 
 
