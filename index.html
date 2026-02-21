@@ -10,6 +10,21 @@
     <link rel="apple-touch-icon" href="logo.png">
     
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Petit ajout pour styliser les nouveaux champs */
+        .input-identite {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .input-identite input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+    </style>
 </head>
    
 <body>
@@ -17,6 +32,15 @@
     <div id="welcome-modal" class="modal">
         <div class="modal-content">
             <h2>📖 Guide de Survie : Le Quiz "Objectif Matériaux"</h2>
+            
+            <div id="section-identification">
+                <p><i>Pour commencer, identifie-toi :</i></p>
+                <div class="input-identite">
+                    <input type="text" id="user-prenom" placeholder="Prénom" autocomplete="given-name">
+                    <input type="text" id="user-nom" placeholder="Nom" autocomplete="family-name">
+                </div>
+            </div>
+
             <p><i>Pour obtenir ton 20/20 et valider tes acquis, suis ces quelques conseils :</i></p>
             
             <div class="guide-item">
@@ -35,7 +59,7 @@
                 <p>🔋 <strong>Sauvegarde automatique :</strong> Si tu fermes l'onglet, le jeu se souviendra de ton score. Tu pourras reprendre là où tu t'es arrêté.</p>
             </div>
 
-            <button class="btn-start" onclick="fermerModal()">J'ai compris, c'est parti !</button>
+            <button class="btn-start" onclick="validerEtFermer()">J'ai compris, c'est parti !</button>
             <div class="modal-footer">
                 <label><input type="checkbox" id="nePlusAfficher"> Ne plus afficher ce guide au démarrage</label>
             </div>
