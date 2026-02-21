@@ -528,8 +528,13 @@ window.onload = function() {
     const sauvegarde = JSON.parse(localStorage.getItem('quiz_encours'));
 
     // Remplissage automatique si déjà connu
-    if (prenom) document.getElementById('user-prenom').value = prenom;
-    if (nom) document.getElementById('user-nom').value = nom;
+    if (prenom) {
+        document.getElementById('user-prenom').value = prenom;
+        document.getElementById('user-nom').value = nom;
+        
+        // LA LIGNE MAGIQUE : On cache la section si l'élève est déjà connu
+        document.getElementById('section-identification').style.display = "none";
+    }
 
     if (sauvegarde && sauvegarde.niveau) {
         choisirNiveau(sauvegarde.niveau);
@@ -569,6 +574,7 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.log('Erreur PWA :', err));
   });
 }
+
 
 
 
