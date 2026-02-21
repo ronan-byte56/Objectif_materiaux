@@ -525,11 +525,11 @@ function envoyerResultats() {
     const tempsFormate = `${m}m ${s < 10 ? "0"+s : s}s`;
 
     const donnees = {
-        nom_complet: prenom + " " + nom.toUpperCase(),
-        niveau: niveauActuel,
-        score: score + " / " + questionsAffichees.length,
-        temps: tempsFormate
-    };
+    nom_complet: prenom + " " + nom.toUpperCase(),
+    niveau: niveauActuel,
+    score: score, // On envoie juste le nombre (ex: 16)
+    temps: timerGlobal // On envoie les secondes totales (ex: 501)
+};
 
     // Ton URL Google Apps Script
     const urlScript = "https://script.google.com/macros/s/AKfycbw7JK1wl4VxaUVSlm1m0YLLmOH_HpiXnd20TI-SxlBQmSaDh6jigjSS7KLAsFesAbTg/exec";
@@ -606,6 +606,7 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.log('Erreur PWA :', err));
   });
 }
+
 
 
 
