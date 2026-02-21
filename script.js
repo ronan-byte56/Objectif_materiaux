@@ -516,8 +516,40 @@ function terminerQuiz() {
 
 // NOUVEAU : Fonction pour l'envoi auto (préparation)
 function envoyerResultats() {
-    alert(`Bravo ${prenom} ! Tes résultats (${score}/20 en ${niveauActuel}) sont prêts à être envoyés. (Prochaine étape : connexion Google Sheets)`);
-    // C'est ici qu'on mettra le script d'envoi auto vers Google Sheets/Notion
+    const btn = event.target;
+    btn.disabled = true;
+    btn.innerText = "Envoi en cours...";
+
+    const m = Math.floor(timerGlobal / 60);
+    const s = timerGlobal % 60;
+    const tempsFormate = `${m}m ${s < 10 ? "0"+s : s}s`;
+
+    const donnees = {
+        nom_complet: prenom + " " + nom.toUpperCase(),
+        niveau: niveauActuel,
+        score: score + " / " + questionsAffichees.length,
+        temps: tempsFormate
+    };
+
+    // Ton URL Google Apps Script
+    const urlScript = "https://script.google.com/macros/s/AKfycbw7JK1wl4VxaUVSlm1m0YLLmOH_HpiXnd20TI-SxlBQmSaDh6jigjSS7KLAsFesAbTg/exec";
+
+    fetch(urlScript, {
+        method: "POST",
+        mode: "no-cors", 
+        body: JSON.stringify(donnees)
+    })
+    .then(() => {
+        alert("🚀 Super " + prenom + " ! Tes résultats ont été envoyés avec succès.");
+        btn.innerText = "✅ Résultats envoyés !";
+        btn.style.background = "#2ecc71";
+    })
+    .catch(error => {
+        console.error("Erreur:", error);
+        alert("Zut, l'envoi a échoué. Vérifie ta connexion.");
+        btn.disabled = false;
+        btn.innerText = "Réessayer l'envoi";
+    });
 }
 
 // ==========================================
@@ -574,6 +606,7 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.log('Erreur PWA :', err));
   });
 }
+
 
 
 
