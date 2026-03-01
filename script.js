@@ -18,7 +18,7 @@ let nom = localStorage.getItem('user_nom') || "";
 // 2. BASE DE DONNÉES
 // ==========================================
 const questions = {
-      seconde: [
+      "seconde": [
     { "q": "SÉCURITÉ : Que signifie un pictogramme rouge avec une flamme ?", "a": ["inflammable", "feu", "brule"], "r": "Produit inflammable (ex: acétone, résine)." },
     { "q": "SÉCURITÉ : Quel équipement protège les yeux contre les projections ?", "a": ["lunettes", "visiere", "masque"], "r": "Lunettes de sécurité." },
     { "q": "SÉCURITÉ : Que signifie le sigle EPI ?", "a": ["protection individuelle", "equipement de protection"], "r": "Équipement de Protection Individuelle." },
@@ -133,7 +133,7 @@ const questions = {
     { "q": "TECHNO : Quel est le rôle du catalyseur ?", "a": ["reaction", "durcir", "polymerisation"], "r": "Déclencher la réaction de polymérisation." },
     { "q": "TECHNO : Comment appelle-t-on une pièce ratée présentant des bulles ou manques ?", "a": ["defaut", "rebut", "non conforme"], "r": "Une pièce défectueuse (rebut)." }
   ],
-  premiere: [
+  "premiere": [
     { "q": "INJECTION : Comment appelle-t-on la vis qui pousse la matière ?", "a": ["vis", "plastification", "vis d'injection", "vis de plastification"], "r": "La vis de plastification." },
     { "q": "INJECTION : Quel organe chauffe les granulés dans le fourreau ?", "a": ["colliers", "chauffant", "resistances", "chauffage"], "r": "Les colliers chauffants." },
     { "q": "INJECTION : Nom de la partie où l'on verse les granulés ?", "a": ["tremie", "bac", "entonnoir"], "r": "La trémie." },
@@ -275,7 +275,7 @@ const questions = {
     { "q": "PLAN : Que signifie l'unité par défaut sur un plan mécanique en France ?", "a": ["mm", "millimetre"], "r": "Le millimètre." },
     { "q": "PLAN : Pourquoi numéroter les pièces d'un assemblage ?", "a": ["repere", "montage", "identifier", "nomenclature"], "r": "Pour les identifier dans la nomenclature." }
   ],
-  terminale: [
+  "terminale": [
     { "q": "RHÉOLOGIE : Qu'est-ce que la viscosité apparente ?", "a": ["ecoulement", "vitesse", "epais", "fluide", "resistance"], "r": "La résistance à l'écoulement sous une contrainte donnée." },
     { "q": "INJECTION : À quoi sert l'étude de remplissage (Moldflow) ?", "a": ["simuler", "equilibrer", "defauts", "flux", "logiciel", "remplissage"], "r": "À simuler l'injection pour éviter les défauts avant de fabriquer le moule." },
     { "q": "RHÉOLOGIE : Qu'est-ce qu'un fluide pseudoplastique ?", "a": ["viscosite baisse", "vitesse", "cisaillement", "fluide"], "r": "Un fluide dont la viscosité diminue quand la vitesse d'écoulement augmente." },
@@ -689,6 +689,7 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.log('Erreur PWA :', err));
   });
 }
+
 
 
 
