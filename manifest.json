@@ -1,5 +1,5 @@
 {
- "name": "Objectif Matériaux",
+  "name": "Objectif Matériaux",
   "short_name": "Obj. Matériaux",
   "icons": [
     {
@@ -14,8 +14,8 @@
     }
   ],
   "start_url": "./index.html",
-  "background_color": "#ffffff",
-  "theme_color": "#3498db",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "display": "standalone",
   "scope": "./",
   "lang": "fr-FR"
