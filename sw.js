@@ -1,17 +1,27 @@
-{
-  "name": "Objectif Matériaux",
-  "short_name": "ObjMatos",
-  "description": "Quiz pédagogique sur les matériaux",
-  "start_url": "index.html",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#3498db",
-  "icons": [
-    {
-      "src": "logo.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
-}
+const CACHE_NAME = 'objectif-materiaux-v1';
+const ASSETS = [
+  './',
+  './index.html',
+  './script.js',
+  './style.css',
+  './manifest.json',
+  './logo.png'
+];
+
+// Installation du Service Worker
+self.addEventListener('install', (e) => {
+  e.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS);
+    })
+  );
+});
+
+// Gestion des requêtes pour le mode hors-ligne
+self.addEventListener('fetch', (e) => {
+  e.respondWith(
+    caches.match(e.request).then((response) => {
+      return response || fetch(e.request);
+    })
+  );
+});
