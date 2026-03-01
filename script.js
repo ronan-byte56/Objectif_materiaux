@@ -422,9 +422,10 @@ const questions = {
     { "q": "HSE : Pourquoi ventiler une zone de stratification ?", "a": ["vapeurs", "solvants", "toxicite", "air"], "r": "Pour évacuer les vapeurs toxiques et protéger les opérateurs." },
     { "q": "HSE : Qu'est-ce qu'un EPI ?", "a": ["protection", "equipement", "individuel"], "r": "Un Équipement de Protection Individuelle porté par l'opérateur." },
     { "q": "ENVIRONNEMENT : Qu'est-ce que la REP ?", "a": ["producteur", "responsable", "dechet", "filiere"], "r": "Responsabilité Élargie du Producteur pour la gestion des déchets en fin de vie." },
-    { "q": "HSE : Risque principal du MEKP (peroxyde) ?", "a": ["brulure", "reactif", "oxydant", "incendie"], "r": "Produit très oxydant pouvant provoquer brûlures et incendies." }
-  ]
-};
+   { "q": "HSE : Risque principal du MEKP (peroxyde) ?", "a": ["brulure", "reactif", "oxydant", "incendie"], "r": "Produit très oxydant pouvant provoquer brûlures et incendies." }
+    ]
+}; 
+
 // ==========================================
 // 3. LOGIQUE DU JEU
 // ==========================================
@@ -688,6 +689,7 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.log('Erreur PWA :', err));
   });
 }
+
 
 
 
