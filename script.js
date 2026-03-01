@@ -424,7 +424,6 @@ const questions = {
     { "q": "ENVIRONNEMENT : Qu'est-ce que la REP ?", "a": ["producteur", "responsable", "dechet", "filiere"], "r": "Responsabilité Élargie du Producteur pour la gestion des déchets en fin de vie." },
     { "q": "HSE : Risque principal du MEKP (peroxyde) ?", "a": ["brulure", "reactif", "oxydant", "incendie"], "r": "Produit très oxydant pouvant provoquer brûlures et incendies." }
   ]
-}
 };
 // ==========================================
 // 3. LOGIQUE DU JEU
@@ -689,6 +688,7 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.log('Erreur PWA :', err));
   });
 }
+
 
 
 
