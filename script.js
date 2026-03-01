@@ -40,6 +40,14 @@ const questions = {
         { q: "SÉCURITÉ : Quel masque porter pour poncer du composite ?", a: ["poussiere", "p2", "p3", "blanc", "fpp"], r: "Un masque anti-poussières (P2 ou P3)." },
         { q: "HSE : Pourquoi ne jamais manger dans l'atelier ?", a: ["ingestion", "contamination", "toxique", "manger", "avaler", "produit"], r: "Pour éviter d'ingérer des produits chimiques." },
         { q: "SÉCURITÉ : Que signifie le sigle VLEP ?", a: ["exposition", "limite", "valeur", "pro", "travail"], r: "Valeur Limite d'Exposition Professionnelle." },
+	{ q: "SÉCURITÉ : Que signifie un pictogramme avec une flamme sur un cercle ?", a: ["comburant", "oxydant", "favorise feu"], r: "Produit comburant (favorise l'incendie)." },
+	{ q: "SÉCURITÉ : Quel EPI protège les voies respiratoires contre les vapeurs organiques ?", a: ["masque cartouche", "a2", "respirateur", "charbon actif"], r: "Un masque à cartouches A2 (vapeurs organiques)." },
+	{ q: "SÉCURITÉ : Pourquoi porter des manches longues en stratification ?", a: ["peau", "projection", "contact", "resine"], r: "Pour protéger la peau des projections de résine." },
+	{ q: "SÉCURITÉ : Que faire avant d'utiliser un nouveau produit chimique ?", a: ["fds", "lire", "consigne", "fiche"], r: "Lire la Fiche de Données de Sécurité (FDS)." },
+	{ q: "HSE : Que signifie 'zone ventilée en continu' ?", a: ["air", "extraction", "aspiration", "renouvellement"], r: "Air renouvelé en permanence pour évacuer les vapeurs." },
+	{ q: "SÉCURITÉ : Pourquoi ne pas porter de bagues ou bracelets en atelier ?", a: ["accroche", "machine", "danger", "happe"], r: "Risque d'accrochage avec les machines." },
+	{ q: "SÉCURITÉ : Quel risque présente la poussière de ponçage composite ?", a: ["respiratoire", "poumon", "irritation", "poussiere"], r: "Risque respiratoire et irritation des voies respiratoires." },
+	{ q: "HSE : Comment stocker les produits inflammables ?", a: ["armoire", "fermee", "securisee", "anti feu"], r: "Dans une armoire de sécurité pour produits inflammables." },
 
         // --- COMPLÉMENT MATÉRIAUX ---
        { q: "MATÉRIAUX : Quel est le contraire d'un matériau opaque ?", a: ["transparent", "clair", "translucide"], r: "Un matériau transparent (qui laisse passer la lumière)." },
@@ -52,6 +60,16 @@ const questions = {
        { q: "MATÉRIAUX : Quel plastique utilise-t-on pour les tuyaux d'évacuation d'eau gris ?", a: ["pvc"], r: "Le PVC (Polychlorure de Vinyle)." },
        { q: "MATÉRIAUX : Un matériau qui peut être étiré sans casser est dit...", a: ["ductile", "etirable", "mou"], r: "Ductile." },
        { q: "MATÉRIAUX : Quel est le sigle du Polyamide (type Nylon) ?", a: ["pa"], r: "Le PA." },
+       { q: "MATÉRIAUX : Comment appelle-t-on un matériau composé de deux éléments différents ?", a: ["composite", "melange", "renfort", "matrice"], r: "Un matériau composite." },
+	{ q: "MATÉRIAUX : Dans un composite, la résine est appelée...", a: ["matrice"], r: "La matrice." },
+	{ q: "MATÉRIAUX : Dans un composite, la fibre est appelée...", a: ["renfort"], r: "Le renfort." },
+	{ q: "MATÉRIAUX : Quelle fibre est la plus utilisée en atelier scolaire ?", a: ["verre", "fibre verre"], r: "La fibre de verre." },
+	{ q: "MATÉRIAUX : Quel est l'avantage principal de la fibre de carbone ?", a: ["leger", "rigide", "resistant", "performance"], r: "Très légère et très rigide." },
+	{ q: "MATÉRIAUX : Quel matériau flotte le plus facilement : PE ou acier ?", a: ["pe", "polyethylene"], r: "Le PE (densité plus faible que l'eau)." },
+	{ q: "MATÉRIAUX : Comment appelle-t-on la capacité à résister à la traction ?", a: ["resistance", "traction", "solidite"], r: "La résistance mécanique en traction." },
+	{ q: "MATÉRIAUX : Un matériau qui revient à sa forme après déformation est...", a: ["elastique", "memoire"], r: "Élastique." },
+	{ q: "MATÉRIAUX : Comment appelle-t-on la masse pour un volume donné ?", a: ["densite", "masse volumique"], r: "La masse volumique (densité)." },
+	{ q: "MATÉRIAUX : Quel polymère est utilisé pour les sacs plastiques fins ?", a: ["pebd", "ldpe", "polyethylene basse densite"], r: "Le PEBD." },
 
         // --- PROCÉDÉS & OUTILLAGE ---
        { q: "ATELIER : Comment appelle-t-on l'outil pour étaler la résine ?", a: ["pinceau", "rouleau", "pattes de lapin"], r: "Le pinceau ou le rouleau (patte de lapin)." },
@@ -64,7 +82,15 @@ const questions = {
        { q: "PROCÉDÉ : Qu'est-ce que le 'démoulage' ?", a: ["sortir", "extraire", "enlever"], r: "L'action de sortir la pièce finie du moule." },
        { q: "ATELIER : Pourquoi utilise-t-on une balance de précision ?", a: ["doser", "peser", "melange", "gramme"], r: "Pour respecter le dosage exact résine / catalyseur." },
        { q: "PROCÉDÉ : Qu'est-ce qu'un renfort dans un composite ?", a: ["fibre", "verre", "carbone", "tissu"], r: "C'est la fibre (verre, carbone, kevlar) qui donne la solidité." },
-    
+    { q: "PROCÉDÉ : Comment appelle-t-on l'empilement des couches de fibre ?", a: ["stratification", "stratifie", "empilage"], r: "La stratification." },
+{ q: "PROCÉDÉ : Pourquoi débuller la stratification ?", a: ["air", "bulles", "defaut", "solidite"], r: "Pour éliminer l'air et améliorer la solidité." },
+{ q: "ATELIER : Quel produit facilite le démoulage ?", a: ["agent demoulant", "cire", "demoulant"], r: "Un agent démoulant (cire ou démoulant liquide)." },
+{ q: "PROCÉDÉ : Comment appelle-t-on un moule souple en silicone ?", a: ["moule silicone", "souple", "elastomere"], r: "Un moule silicone." },
+{ q: "ATELIER : Quel outil sert à découper les tissus de fibre ?", a: ["ciseaux", "cisaille", "coupe"], r: "Des ciseaux ou une cisaille." },
+{ q: "PROCÉDÉ : Que signifie 'temps de prise' d'une résine ?", a: ["durcir", "reaction", "temps travail", "gel"], r: "Temps nécessaire pour commencer à durcir (gélification)." },
+{ q: "PROCÉDÉ : Pourquoi peser séparément résine et catalyseur ?", a: ["precision", "dosage", "exact"], r: "Pour respecter le dosage exact." },
+{ q: "ATELIER : À quoi sert le ruban adhésif sur un moule ?", a: ["proteger", "limite", "bord", "masquage"], r: "Protéger ou délimiter les zones." },
+
        // --- CALCULS (Réponses numériques + unités si l'élève les met) ---
         { q: "CALCUL : 1 kg de résine dosée à 2% de catalyseur. Masse de catalyseur en grammes ?", a: ["20"], r: "20g (1000 * 0,02)." },
         { q: "CALCUL : 400g de résine dosée à 3% de catalyseur. Masse de catalyseur ?", a: ["12"], r: "12g (400 * 0,03)." },
@@ -79,7 +105,13 @@ const questions = {
        { q: "CALCUL : Si je mélange 100g de résine et 2g de catalyseur, quelle est la masse totale ?", a: ["102"], r: "102g." },
        { q: "MESURE : Combien de centimètres y a-t-il dans 1 mètre ?", a: ["100"], r: "100 cm." },
        { q: "CALCUL : Un pot vide pèse 50g. Avec la résine, il pèse 250g. Quelle est la masse de résine ?", a: ["200"], r: "200g." },
-              
+        { q: "CALCUL : 750 g de résine à 2% de catalyseur. Masse ?", a: ["15"], r: "15 g." },
+{ q: "CALCUL : 1,5 kg = combien de grammes ?", a: ["1500"], r: "1500 g." },
+{ q: "CALCUL : 300 g de résine + 6 g de catalyseur. Masse totale ?", a: ["306"], r: "306 g." },
+{ q: "MESURE : 5 mm = combien de cm ?", a: ["0.5", "0,5"], r: "0,5 cm." },
+{ q: "MESURE : 2500 g = combien de kg ?", a: ["2.5", "2,5"], r: "2,5 kg." },
+{ q: "CALCUL : 10 couches de 0,3 mm chacune. Épaisseur totale ?", a: ["3"], r: "3 mm." },
+      
         // --- MATÉRIAUX : POLYMÈRES ---
         { q: "MATÉRIAUX : Famille de plastiques qui ramollissent à la chaleur ?", a: ["thermoplastique", "tp", "fond", "mou"], r: "Les thermoplastiques." },
         { q: "MATÉRIAUX : Famille de résine qui durcit de façon irréversible ?", a: ["thermodurcissable", "td", "durcit", "cuit"], r: "Les thermodurcissables." },
@@ -105,8 +137,17 @@ const questions = {
         { q: "MATÉRIAUX : Lequel est le plus léger : l'acier ou le plastique ?", a: ["plastique", "pvc", "pe"], r: "Le plastique (densité plus faible)." },
         { q: "MATÉRIAUX : Qu'est-ce qu'une résine époxy ?", a: ["thermodurcissable", "td", "epoxy", "colle"], r: "Une résine thermodurcissable haute performance." },
         { q: "MATÉRIAUX : Pourquoi sèche-t-on certaines matières avant usage ?", a: ["humidite", "eau", "defaut", "bulles", "etuve"], r: "Pour enlever l'humidité qui crée des défauts." },
-        { q: "MATÉRIAUX : Qu'est-ce qu'un additif ?", a: ["ameliorer", "ajouter", "plus", "uv", "aide"], r: "Un produit ajouté pour améliorer une propriété (ex: anti-UV)." }
-    ],
+        { q: "MATÉRIAUX : Qu'est-ce qu'un additif ?", a: ["ameliorer", "ajouter", "plus", "uv", "aide"], r: "Un produit ajouté pour améliorer une propriété (ex: anti-UV)." },
+    // ===============================
+// --- TECHNO GÉNÉRALE (supplément)
+// ===============================
+
+{ q: "TECHNO : Quel procédé permet de donner forme aux thermoplastiques chauffés dans un moule ?", a: ["injection", "moulage injection"], r: "Le moulage par injection." },
+{ q: "TECHNO : Comment appelle-t-on la mise en forme par aspiration d'une plaque chauffée ?", a: ["thermoformage", "aspiration", "vide"], r: "Le thermoformage." },
+{ q: "TECHNO : Sous quelle forme arrive la résine polyester liquide ?", a: ["liquide", "visqueux"], r: "Liquide visqueuse." },
+{ q: "TECHNO : Quel est le rôle du catalyseur ?", a: ["reaction", "durcir", "polymerisation"], r: "Déclencher la réaction de polymérisation." },
+{ q: "TECHNO : Comment appelle-t-on une pièce ratée présentant des bulles ou manques ?", a: ["defaut", "rebut", "non conforme"], r: "Une pièce défectueuse (rebut)." }
+],
 premiere: [
         // --- INJECTION PLASTURGIE ---
         { q: "INJECTION : Comment appelle-t-on la vis qui pousse la matière ?", a: ["vis", "plastification", "vis d'injection", "vis de plastification"], r: "La vis de plastification." },
@@ -222,7 +263,65 @@ premiere: [
         { q: "PLAN : Qu'est-ce qu'une projection orthogonale ?", a: ["vues", "faces", "projection", "dessin"], r: "La représentation de l'objet sur plusieurs plans (face, dessus...)." },
         { q: "PLAN : Pourquoi le cartouche contient-il un indice de révision ?", a: ["modification", "version", "changement", "maj"], r: "Pour savoir si c'est la version la plus récente du plan." },
         { q: "PLAN : Que signifie 'Echelle 2:1' ?", a: ["agrandi", "double", "plus grand"], r: "Le dessin est deux fois plus grand que la réalité." },
-        { q: "PLAN : Quel outil informatique utilise-t-on pour dessiner ?", a: ["cao", "dao", "ordinateur", "logiciel", "solidworks"], r: "La CAO (Conception Assistée par Ordinateur)." }
+        { q: "PLAN : Quel outil informatique utilise-t-on pour dessiner ?", a: ["cao", "dao", "ordinateur", "logiciel", "solidworks"], r: "La CAO (Conception Assistée par Ordinateur)." },
+// ===================================
+// --- INJECTION (supplément avancé)
+// ===================================
+
+{ q: "INJECTION : Comment appelle-t-on la zone où la matière fond en premier dans le fourreau ?", a: ["zone alimentation", "zone compression", "chauffe", "plastification"], r: "La zone d'alimentation (début de plastification)." },
+{ q: "INJECTION : Quel paramètre règle la vitesse d'entrée de matière dans le moule ?", a: ["vitesse injection", "debit", "vitesse", "remplissage"], r: "La vitesse d'injection." },
+{ q: "INJECTION : Que provoque une vitesse d'injection trop rapide ?", a: ["brulure", "degradation", "jetting", "marque"], r: "Des brûlures ou défauts d'aspect (jetting, échauffement)." },
+{ q: "INJECTION : Comment appelle-t-on la pression maximale atteinte pendant l'injection ?", a: ["pression injection", "pic pression", "maxi", "pression max"], r: "La pression d'injection maximale." },
+{ q: "INJECTION : Quel défaut donne un moule mal refroidi ?", a: ["retrait", "deformation", "gauchissement", "voilage"], r: "Déformation ou gauchissement de la pièce." },
+{ q: "INJECTION : Comment appelle-t-on les canaux qui amènent la matière aux empreintes ?", a: ["canaux", "runners", "distribution", "alimentation"], r: "Les canaux d'alimentation (runners)." },
+{ q: "INJECTION : Que signifie 'contre-dépouille' ?", a: ["bloque", "demoulage difficile", "accroche", "forme"], r: "Une forme qui empêche le démoulage direct." },
+{ q: "INJECTION : Pourquoi texturer une empreinte de moule ?", a: ["aspect", "grain", "decor", "rayure"], r: "Pour donner un aspect de surface (grain, décor)." },
+
+// ===================================
+// --- COMPOSITES (supplément technique)
+// ===================================
+
+{ q: "COMPOSITES : Comment appelle-t-on l'orientation des fibres dans une pièce ?", a: ["orientation", "direction", "angle fibre"], r: "L'orientation des fibres." },
+{ q: "COMPOSITES : Pourquoi croiser les couches (0°/90°) ?", a: ["rigidite", "solidite", "multi direction", "resistance"], r: "Pour obtenir une résistance dans plusieurs directions." },
+{ q: "COMPOSITES : Qu'est-ce qu'un délaminage ?", a: ["separation", "couches", "decollement", "fissure"], r: "La séparation des couches de stratifié." },
+{ q: "COMPOSITES : Comment appelle-t-on le pourcentage de fibre dans un composite ?", a: ["taux fibre", "fraction", "pourcentage", "ratio"], r: "Le taux volumique ou massique de fibre." },
+{ q: "COMPOSITES : Quel défaut apparaît si trop de résine est utilisée ?", a: ["lourd", "cassant", "pauvre fibre", "fragile"], r: "Pièce plus lourde et moins performante mécaniquement." },
+{ q: "COMPOSITES : Pourquoi compacter sous vide ?", a: ["chasser air", "serrer fibres", "compactage", "densite"], r: "Pour chasser l'air et compacter les fibres." },
+{ q: "COMPOSITES : Comment appelle-t-on une pièce creuse très légère type bateau ?", a: ["sandwich", "ame", "structure sandwich"], r: "Une structure sandwich." },
+{ q: "COMPOSITES : Quel est l'avantage d'un tissu par rapport à un mat ?", a: ["orientation", "resistance", "controle", "proprete"], r: "Orientation contrôlée et meilleure résistance mécanique." },
+
+// ===================================
+// --- CALCULS (supplément première)
+// ===================================
+
+{ q: "PROD : Cycle de 20 s. Combien de cycles en 1 minute ?", a: ["3"], r: "3 cycles (60 / 20)." },
+{ q: "PROD : 3 pièces par cycle, 3 cycles/min. Combien de pièces/min ?", a: ["9"], r: "9 pièces." },
+{ q: "COMPOSITES : 2 m² avec tissu 300 g/m². Masse de fibre ?", a: ["600"], r: "600 g." },
+{ q: "COMPOSITES : 600 g de fibre, ratio résine 40%. Masse de résine ?", a: ["240"], r: "240 g (600 × 0,40)." },
+{ q: "INJECTION : 60 pièces/heure. Combien en 8 h ?", a: ["480"], r: "480 pièces." },
+{ q: "MESURE : 0,8 mm = combien en micromètres ?", a: ["800"], r: "800 µm." },
+
+// ===================================
+// --- QUALITÉ / MÉTHODES (supplément)
+// ===================================
+
+{ q: "QUALITÉ : Que signifie 'traçabilité lot matière' ?", a: ["origine", "suivi", "lot", "numero"], r: "Pouvoir retrouver l'origine et le numéro du lot utilisé." },
+{ q: "QUALITÉ : Pourquoi contrôler la première pièce de série ?", a: ["valider", "reglage", "conforme", "debut"], r: "Valider les réglages avant production complète." },
+{ q: "QUALITÉ : Qu'est-ce qu'un défaut d'aspect ?", a: ["visuel", "rayure", "bulle", "marque"], r: "Un défaut visible à l'œil nu (rayure, bulle…)." },
+{ q: "QUALITÉ : Que signifie 'rebuts' en production ?", a: ["jete", "defaut", "dechet", "non conforme"], r: "Pièces non conformes mises au rebut." },
+{ q: "MÉTHODES : Pourquoi standardiser un mode opératoire ?", a: ["repeter", "qualite", "identique", "procedure"], r: "Pour obtenir toujours le même résultat." },
+{ q: "QUALITÉ : Qu'est-ce qu'un contrôle dimensionnel ?", a: ["mesurer", "cotes", "verifier", "dimensions"], r: "Vérifier les dimensions par mesure." },
+
+// ===================================
+// --- LECTURE DE PLAN (supplément)
+// ===================================
+
+{ q: "PLAN : Que signifie une cote encadrée ?", a: ["fonctionnelle", "importante", "critique"], r: "Une cote fonctionnelle ou critique." },
+{ q: "PLAN : Comment appelle-t-on la matière indiquée 'ABS noir' ?", a: ["specification", "matiere", "designation"], r: "La désignation matière." },
+{ q: "PLAN : Que signifie un angle coté 45° ?", a: ["angle", "inclinaison", "pente"], r: "Une inclinaison de 45 degrés." },
+{ q: "PLAN : À quoi sert une coupe AA ?", a: ["section", "interieur", "detail"], r: "Montrer l'intérieur suivant le plan de coupe AA." },
+{ q: "PLAN : Que signifie l'unité par défaut sur un plan mécanique en France ?", a: ["mm", "millimetre"], r: "Le millimètre." },
+{ q: "PLAN : Pourquoi numéroter les pièces d'un assemblage ?", a: ["repere", "montage", "identifier", "nomenclature"], r: "Pour les identifier dans la nomenclature." }
 ],
     terminale: [
         // --- RHÉOLOGIE ET RÉGLAGE AVANCÉ ---
@@ -340,7 +439,56 @@ premiere: [
         { q: "HSE : Pourquoi interdire les bijoux en atelier ?", a: ["happe", "brulure", "conduction", "coincer"], r: "Risque de happement ou de court-circuit électrique." },
         { q: "HSE : Qu'est-ce qu'un accident du travail ?", a: ["blesse", "pendant", "travail", "accident"], r: "Un accident survenu par le fait ou à l'occasion du travail." },
         { q: "ENVIRONNEMENT : Pourquoi séparer les déchets composites des métaux ?", a: ["tri", "recyclage", "separation", "filiere"], r: "Parce qu'ils suivent des filières de traitement totalement différentes." },
-        { q: "HSE : Que signifie le marquage CE ?", a: ["norme europeenne", "europe", "conforme", "securite"], r: "Le produit respecte les normes de sécurité européennes." }
+        { q: "HSE : Que signifie le marquage CE ?", a: ["norme europeenne", "europe", "conforme", "securite"], r: "Le produit respecte les normes de sécurité européennes." },
+// --- INJECTION AVANCÉE (complément) ---
+{ q: "INJECTION : Qu'est-ce que le matelas matière ?", a: ["reste", "fin", "vis", "coussin", "pression"], r: "La petite quantité de matière restante devant la vis en fin d'injection pour maintenir la pression." },
+{ q: "INJECTION : Pourquoi garder un matelas constant ?", a: ["stabilite", "pression", "regulier", "process"], r: "Pour garantir une pression de maintien stable et un procédé répétable." },
+{ q: "INJECTION : Qu'est-ce qu'un jet libre (jetting) ?", a: ["jet", "fil", "serpent", "trace"], r: "Un filet de matière qui avance sans coller aux parois et laisse une trace en serpent." },
+{ q: "INJECTION : Cause principale des brûlures matière ?", a: ["air", "compression", "echauffement", "ventilation"], r: "Compression et échauffement de l'air mal évacué dans l'empreinte." },
+{ q: "INJECTION : Rôle des évents de moule ?", a: ["air", "sortir", "gaz", "ventilation"], r: "Permettre à l'air et aux gaz de s'échapper pendant le remplissage." },
+{ q: "INJECTION : Qu'est-ce que le temps de maintien ?", a: ["pression", "compactage", "retrait", "maintien"], r: "Le temps durant lequel on maintient la pression pour compenser le retrait matière." },
+{ q: "INJECTION : Pourquoi sécher un PA avant injection ?", a: ["humidite", "bulle", "hydrolyse", "eau"], r: "Pour éliminer l'humidité qui provoque bulles et dégradation par hydrolyse." },
+{ q: "INJECTION : Qu'est-ce qu'une carotte froide ?", a: ["matiere", "bouchon", "froide", "debut"], r: "La première matière solidifiée en entrée d'empreinte qui peut perturber le remplissage." },
+{ q: "INJECTION : Rôle d'un régulateur thermique ?", a: ["temperature", "eau", "moule", "stable"], r: "Maintenir la température du moule constante par circulation d'eau ou d'huile." },
+{ q: "INJECTION : Qu'est-ce que le surmoulage ?", a: ["deux", "matiere", "injection", "assemblage"], r: "Injecter une seconde matière sur une première pièce déjà moulée." },
+
+// --- COMPOSITES (complément) ---
+{ q: "COMPOSITES : Qu'est-ce qu'un composite sandwich ?", a: ["peaux", "ame", "leger", "structure"], r: "Deux peaux résistantes séparées par une âme légère pour maximiser la rigidité." },
+{ q: "COMPOSITES : Rôle du tissu d'arrachage (peel ply) ?", a: ["surface", "rugueux", "collage", "arrachage"], r: "Créer une surface rugueuse propre prête au collage après retrait." },
+{ q: "COMPOSITES : Qu'est-ce que la délamination ?", a: ["separation", "plis", "interface", "defaut"], r: "La séparation des couches entre elles dans le stratifié." },
+{ q: "COMPOSITES : Pourquoi orienter les fibres à 0°/90°/±45° ?", a: ["multi", "charges", "directions", "resistance"], r: "Pour résister aux efforts dans plusieurs directions." },
+{ q: "COMPOSITES : Qu'est-ce que l'exothermie d'une résine ?", a: ["chaleur", "reaction", "montee", "temperature"], r: "La chaleur dégagée par la réaction chimique pendant la polymérisation." },
+{ q: "COMPOSITES : Rôle du sac à vide ?", a: ["pression", "compactage", "air", "etanche"], r: "Appliquer une pression uniforme et extraire l'air du stratifié." },
+{ q: "COMPOSITES : Qu'est-ce qu'un défaut de porosité ?", a: ["bulles", "air", "vide", "micro"], r: "Présence de micro-bulles d'air piégées dans la résine." },
+{ q: "COMPOSITES : Avantage principal du RTM ?", a: ["moule ferme", "proprete", "serie", "controle"], r: "Procédé fermé propre permettant une production répétable en série." },
+{ q: "COMPOSITES : Qu'est-ce que le tack d'un pré-imprégné ?", a: ["collant", "adhesion", "manipulation"], r: "Son caractère collant qui facilite le maintien des plis pendant le drapage." },
+{ q: "COMPOSITES : Pourquoi contrôler l'humidité avant collage ?", a: ["adhesion", "defaut", "eau", "faible"], r: "L'humidité diminue fortement la qualité d'adhésion." },
+
+// --- LEAN / PRODUCTION (complément) ---
+{ q: "LEAN : Qu'est-ce que le flux continu ?", a: ["sans stock", "enchainee", "piece", "direct"], r: "Les pièces avancent sans interruption ni stock intermédiaire." },
+{ q: "PROD : Qu'est-ce que le takt time ?", a: ["rythme client", "cadence", "demande"], r: "Le rythme de production nécessaire pour répondre à la demande client." },
+{ q: "LEAN : Qu'est-ce que le management visuel ?", a: ["affichage", "indicateurs", "tableau", "vue"], r: "Rendre l'état de production visible immédiatement par des indicateurs simples." },
+{ q: "PROD : Qu'est-ce qu'une gamme opératoire ?", a: ["etapes", "ordre", "processus", "mode"], r: "La liste ordonnée des opérations nécessaires pour fabriquer la pièce." },
+{ q: "LEAN : Qu'est-ce qu'un stock tampon ?", a: ["reserve", "protection", "flux", "attente"], r: "Un petit stock servant à absorber les variations du flux." },
+{ q: "QUALITÉ : Qu'est-ce qu'une capabilité Cp/Cpk ?", a: ["dispersion", "tolerance", "statistique", "process"], r: "Un indicateur statistique mesurant l'aptitude du procédé à tenir les tolérances." },
+{ q: "PROD : Qu'est-ce que le rebus ?", a: ["dechet", "refuse", "non conforme"], r: "Une pièce définitivement inutilisable qui doit être jetée." },
+{ q: "LEAN : Qu'est-ce que l'andon ?", a: ["signal", "alerte", "probleme", "lumineux"], r: "Un système d'alerte visuelle signalant un problème sur la ligne." },
+{ q: "PROD : Pourquoi équilibrer une ligne ?", a: ["charge", "goulet", "temps", "uniforme"], r: "Pour répartir la charge et éviter les goulets d'étranglement." },
+{ q: "QUALITÉ : Qu'est-ce qu'un audit process ?", a: ["verification", "respect", "procedure", "controle"], r: "Une vérification que les méthodes sont correctement appliquées." },
+
+// --- CALCULS (complément) ---
+{ q: "CALCUL : Temps de cycle 30s. Production en 8h ?", a: ["960"], r: "960 pièces (28800 / 30)." },
+{ q: "CALCUL : 500 pièces bonnes sur 520. Rendement qualité ?", a: ["96", "96%"], r: "96% environ (500 / 520 * 100)." },
+{ q: "CALCUL : Masse 240 g, densité 1,2. Volume ?", a: ["200"], r: "200 cm3." },
+{ q: "CALCUL : Pression 300 bars, surface 150 cm2. Force ?", a: ["45000"], r: "45 000 kg." },
+{ q: "CALCUL : 1200 pièces en 4h. Cadence horaire ?", a: ["300"], r: "300 pièces/heure." },
+
+// --- HSE / ENVIRONNEMENT (complément) ---
+{ q: "HSE : Rôle d'une FDS (fiche de données de sécurité) ?", a: ["risques", "danger", "produit", "securite"], r: "Informer sur les dangers d'un produit chimique et les protections nécessaires." },
+{ q: "HSE : Pourquoi ventiler une zone de stratification ?", a: ["vapeurs", "solvants", "toxicite", "air"], r: "Pour évacuer les vapeurs toxiques et protéger les opérateurs." },
+{ q: "HSE : Qu'est-ce qu'un EPI ?", a: ["protection", "equipement", "individuel"], r: "Un Équipement de Protection Individuelle porté par l'opérateur." },
+{ q: "ENVIRONNEMENT : Qu'est-ce que la REP ?", a: ["producteur", "responsable", "dechet", "filiere"], r: "Responsabilité Élargie du Producteur pour la gestion des déchets en fin de vie." },
+{ q: "HSE : Risque principal du MEKP (peroxyde) ?", a: ["brulure", "reactif", "oxydant", "incendie"], r: "Produit très oxydant pouvant provoquer brûlures et incendies." }
   ]
 };
 // ==========================================
@@ -606,6 +754,7 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.log('Erreur PWA :', err));
   });
 }
+
 
 
 
