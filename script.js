@@ -693,6 +693,14 @@ function ouvrirAvatar() {
     if (document.getElementById("jeu").style.display !== "none") return; // pas pendant un quiz
     ecranAvantAvatar = visible || "selection-niveau";
     avatarEnCours = avatar ? { ...avatar } : avatarAleatoire();
+    // Classe : modifiable ici aussi (ex. erreur à l'inscription, passage en Première)
+    document.querySelectorAll("#profil-classe button").forEach(b => {
+        b.classList.toggle("choisie", b.dataset.classe === classe);
+        b.onclick = () => {
+            document.querySelectorAll("#profil-classe button").forEach(x => x.classList.remove("choisie"));
+            b.classList.add("choisie");
+        };
+    });
     dessinerReglagesAvatar();
     afficherEcran("ecran-avatar");
 }
@@ -711,6 +719,11 @@ function avatarAuHasard() {
 function enregistrerAvatar() {
     avatar = { ...avatarEnCours };
     localStorage.setItem('user_avatar', JSON.stringify(avatar));
+    const choisie = document.querySelector("#profil-classe button.choisie");
+    if (choisie) {
+        classe = choisie.dataset.classe;
+        localStorage.setItem('user_classe', classe);
+    }
     majEntete();
     envoyerProfil();
     fermerAvatar();

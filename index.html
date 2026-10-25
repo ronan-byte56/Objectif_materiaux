@@ -58,7 +58,7 @@
 
         <!-- Bandeau du haut : élève + diamants (questions réussies) -->
         <header class="entete">
-            <button class="eleve" onclick="ouvrirAvatar()" aria-label="Modifier mon avatar">
+            <button class="eleve" onclick="ouvrirAvatar()" aria-label="Modifier mon profil (classe et avatar)">
                 <div class="avatar" id="avatar"></div>
                 <div>
                     <div class="salut" id="salut">Salut !</div>
@@ -160,14 +160,26 @@
         <section id="ecran-avatar" style="display:none;">
             <div class="barre-haut">
                 <button class="btn btn-rond" onclick="fermerAvatar()" aria-label="Retour">‹</button>
-                <h2 class="titre-section">Mon avatar</h2>
+                <h2 class="titre-section">Mon profil</h2>
             </div>
+            <div class="carte reglages-avatar">
+                <div class="reglage">
+                    <div class="reglage-titre">Ma classe</div>
+                    <div class="choix-classe" id="profil-classe">
+                        <button type="button" data-classe="2COMPO">2COMPO</button>
+                        <button type="button" data-classe="1COMPO">1COMPO</button>
+                        <button type="button" data-classe="TCOMPO">TCOMPO</button>
+                        <button type="button" data-classe="Invité">Invité</button>
+                    </div>
+                </div>
+            </div>
+            <h3 class="titre-section">Mon avatar</h3>
             <div class="carte apercu-avatar fond-bleu" id="fond-apercu">
                 <img id="apercu-avatar" alt="Ton avatar">
                 <button class="btn btn-blanc btn-hasard" onclick="avatarAuHasard()"><img data-illu="Game die/3D/game_die_3d.png" alt="">Au hasard</button>
             </div>
             <div class="carte reglages-avatar" id="reglages-avatar"></div>
-            <button class="btn btn-noir btn-large btn-bas" onclick="enregistrerAvatar()">Enregistrer mon avatar</button>
+            <button class="btn btn-noir btn-large btn-bas" onclick="enregistrerAvatar()">Enregistrer mon profil</button>
         </section>
 
         <!-- Écran classement : podium des 3 premiers de la classe (personne d'autre n'est affiché) -->
