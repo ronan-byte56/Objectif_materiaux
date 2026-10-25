@@ -26,11 +26,13 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Réseau d'abord (pour recevoir les nouveaux cours), cache si pas de connexion
+// Réseau d'abord (pour recevoir les nouveaux cours), cache si pas de connexion.
+// cache: 'no-cache' = toujours demander à GitHub si le fichier a changé
+// (sinon le navigateur garde l'ancienne version jusqu'à 10 minutes).
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) return;
   e.respondWith(
-    fetch(e.request)
+    fetch(e.request, { cache: 'no-cache' })
       .then((response) => {
         const copie = response.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(e.request, copie));
