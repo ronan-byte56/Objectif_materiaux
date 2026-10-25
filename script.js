@@ -2,6 +2,17 @@
 // 1. ÉTAT DU JEU
 // ==========================================
 // Les questions sont dans questions.js (constante COURS : niveau -> cours -> questions)
+
+// Remise à zéro générale : changer cette date efface TOUT sur chaque téléphone à sa prochaine
+// ouverture (progression, diamants, profil, avatar), comme une rentrée de septembre.
+const REMISE_A_ZERO = "2026-10-25";
+try {
+    if (localStorage.getItem('remise_a_zero') !== REMISE_A_ZERO) {
+        localStorage.clear();
+        localStorage.setItem('remise_a_zero', REMISE_A_ZERO);
+    }
+} catch (e) { /* stockage indisponible : rien à effacer */ }
+
 let questionsReussies = JSON.parse(localStorage.getItem('quiz_reussies')) || [];
 let questionsAffichees = [];
 let niveauActuel = "";
