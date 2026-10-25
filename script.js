@@ -185,6 +185,8 @@ function lancerCours(niveau, idCours) {
     if (!cours) return;
     niveauActuel = niveau;
     coursActuel = cours;
+    clearTimeout(minuterieSuite);
+    peutValider = true;
 
     // Reprise : partie en cours (app rouverte) ou partie mise en pause (changement de cours)
     const encours = JSON.parse(localStorage.getItem('quiz_encours'));
@@ -234,7 +236,7 @@ function etatSession() {
         niveau: niveauActuel,
         cours: coursActuel.id,
         questions: questionsAffichees,
-        index: indexQuestion,
+        index: indexQuestion + (peutValider ? 0 : 1), // pendant la correction, la question compte comme faite
         score: score,
         timer: timerGlobal,
         envoyes: nbRepondusEnvoyes
@@ -322,8 +324,8 @@ function verifierReponse() {
         feedback.style.display = "none";
         indexQuestion++;
         if (indexQuestion < questionsAffichees.length) {
-            afficherQuestion();
             peutValider = true;
+            afficherQuestion();
         } else {
             terminerQuiz();
         }
@@ -462,6 +464,12 @@ window.onload = function() {
         const cours = trouverCours(sauvegarde.niveau, sauvegarde.cours);
         if (cours && (cours.ouvert || modeProf)) {
             lancerCours(sauvegarde.niveau, sauvegarde.cours);
+            // Le téléphone a pu fermer l'app avant que l'envoi "en cours" parte : on le rattrape
+            if (indexQuestion > nbRepondusEnvoyes) {
+                envoyerResultats(donneesResultats(`en cours ${indexQuestion}/${questionsAffichees.length}`));
+                nbRepondusEnvoyes = indexQuestion;
+                sauvegarderSession();
+            }
         } else {
             localStorage.removeItem('quiz_encours');
             sauvegarde = null;
