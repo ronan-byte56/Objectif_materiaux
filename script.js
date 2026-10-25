@@ -11,6 +11,7 @@ let score = 0;
 let timerGlobal = 0;
 let intervalTimer;
 let peutValider = true;
+let nbRepondusEnvoyes = 0; // pour n'envoyer une partie interrompue que si l'élève a avancé depuis
 
 // Récupération de l'identité
 let prenom = localStorage.getItem('user_prenom') || "";
@@ -21,6 +22,9 @@ const modeProf = new URLSearchParams(location.search).has('prof');
 
 const NOMS_NIVEAUX = { seconde: "Seconde", premiere: "Première", terminale: "Terminale" };
 const JOURS_NOUVEAU = 14; // un cours ouvert depuis moins de 14 jours porte le badge "Nouveau"
+
+// Google Apps Script du prof : reçoit les résultats et les écrit dans son Google Sheet
+const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbw7JK1wl4VxaUVSlm1m0YLLmOH_HpiXnd20TI-SxlBQmSaDh6jigjSS7KLAsFesAbTg/exec";
 
 // ==========================================
 // 2. CORRECTION DES RÉPONSES
@@ -185,6 +189,7 @@ function lancerCours(niveau, idCours) {
         indexQuestion = sauvegarde.index;
         score = sauvegarde.score;
         timerGlobal = sauvegarde.timer;
+        nbRepondusEnvoyes = sauvegarde.envoyes || 0;
     } else {
         // Nouvelle session : les questions jamais réussies de ce cours
         let dispos = cours.questions.filter(q => !questionsReussies.includes(q.q));
@@ -201,6 +206,7 @@ function lancerCours(niveau, idCours) {
         indexQuestion = 0;
         score = 0;
         timerGlobal = 0;
+        nbRepondusEnvoyes = 0;
     }
 
     document.getElementById("titre-cours-jeu").innerText = "📁 " + cours.titre;
@@ -219,7 +225,8 @@ function sauvegarderSession() {
         questions: questionsAffichees,
         index: indexQuestion,
         score: score,
-        timer: timerGlobal
+        timer: timerGlobal,
+        envoyes: nbRepondusEnvoyes
     };
     localStorage.setItem('quiz_encours', JSON.stringify(etat));
 }
@@ -302,51 +309,87 @@ function terminerQuiz() {
             <p>Progression sur ce cours : <span style="color: #2ecc71;">${progressionCours}</span></p>
             <p>Temps : ${m}m ${s < 10 ? "0"+s : s}s</p>
             <hr style="margin: 25px auto; border-color: #eee;">
-            <button class="btn-go" onclick="envoyerResultats(this)">🚀 Envoyer mes résultats au prof</button>
-            <br><br>
+            <p id="statut-envoi">📤 Envoi de tes résultats au prof…</p>
             <button class="btn-lvl" onclick="location.reload()" style="background:none; color:#555; border:1px solid #ccc;">Retour au menu</button>
         </div>
     `;
+
+    // Envoi automatique : l'élève n'a plus rien à cliquer
+    envoyerResultats(donneesResultats("terminé"));
 }
 
-// Envoi des résultats vers le Google Sheet du prof (Google Apps Script)
-function envoyerResultats(btn) {
-    btn.disabled = true;
-    btn.innerText = "Envoi en cours...";
+// ==========================================
+// ENVOI DES RÉSULTATS AU PROF (Google Sheet via Google Apps Script)
+// ==========================================
+// Fin de quiz : envoi automatique. Partie interrompue (l'élève quitte l'app ou change
+// d'appli en cours de quiz) : envoi d'une ligne "en cours x/20", seulement s'il a avancé.
+// Sans connexion : le résultat est gardé et renvoyé à la prochaine ouverture de l'app.
 
-    const donnees = {
+function donneesResultats(statut) {
+    // Le cours et l'état apparaissent dans la colonne "niveau" du Google Sheet
+    return {
         nom_complet: prenom + " " + nom.toUpperCase(),
-        niveau: niveauActuel + " – " + coursActuel.titre, // le cours apparaît dans la colonne niveau
+        niveau: niveauActuel + " – " + coursActuel.titre + " (" + statut + ")",
         cours: coursActuel.titre,
+        statut: statut,
         score: score, // On envoie juste le nombre (ex: 16)
         temps: timerGlobal // On envoie les secondes totales (ex: 501)
     };
-
-    const urlScript = "https://script.google.com/macros/s/AKfycbw7JK1wl4VxaUVSlm1m0YLLmOH_HpiXnd20TI-SxlBQmSaDh6jigjSS7KLAsFesAbTg/exec";
-
-    fetch(urlScript, {
-        method: "POST",
-        mode: "no-cors",
-        body: JSON.stringify(donnees)
-    })
-    .then(() => {
-        alert("🚀 Super " + prenom + " ! Tes résultats ont été envoyés avec succès.");
-        btn.innerText = "✅ Résultats envoyés !";
-        btn.style.background = "#2ecc71";
-    })
-    .catch(error => {
-        console.error("Erreur:", error);
-        alert("Zut, l'envoi a échoué. Vérifie ta connexion.");
-        btn.disabled = false;
-        btn.innerText = "Réessayer l'envoi";
-    });
 }
+
+function envoyerResultats(donnees) {
+    const statut = document.getElementById("statut-envoi");
+    fetch(URL_SCRIPT, { method: "POST", mode: "no-cors", body: JSON.stringify(donnees) })
+        .then(() => {
+            if (statut) statut.innerText = "✅ Tes résultats ont été envoyés au prof.";
+        })
+        .catch(() => {
+            mettreEnAttente(donnees);
+            if (statut) statut.innerText = "📶 Pas de connexion : tes résultats partiront tout seuls à la prochaine ouverture de l'app.";
+        });
+}
+
+function mettreEnAttente(donnees) {
+    const attente = JSON.parse(localStorage.getItem('envois_en_attente')) || [];
+    attente.push(donnees);
+    localStorage.setItem('envois_en_attente', JSON.stringify(attente));
+}
+
+function renvoyerEnAttente() {
+    const attente = JSON.parse(localStorage.getItem('envois_en_attente')) || [];
+    if (attente.length === 0) return;
+    localStorage.removeItem('envois_en_attente');
+    attente.forEach(d => envoyerResultats(d)); // en cas de nouvel échec, ils sont remis en attente
+}
+
+// Partie interrompue : appelé quand l'app passe en arrière-plan ou se ferme
+function envoyerPartieInterrompue() {
+    const quizEnCours = coursActuel && document.getElementById("jeu").style.display !== "none"
+        && document.getElementById("question") && indexQuestion < questionsAffichees.length;
+    if (!quizEnCours) return;
+    const nbRepondus = indexQuestion + (peutValider ? 0 : 1);
+    if (nbRepondus <= nbRepondusEnvoyes) return; // rien de nouveau depuis le dernier envoi
+
+    const donnees = donneesResultats(`en cours ${nbRepondus}/${questionsAffichees.length}`);
+    // sendBeacon : l'envoi part même si la page est en train de se fermer
+    const parti = navigator.sendBeacon && navigator.sendBeacon(URL_SCRIPT, JSON.stringify(donnees));
+    if (!parti) mettreEnAttente(donnees);
+    nbRepondusEnvoyes = nbRepondus;
+    sauvegarderSession();
+}
+
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') envoyerPartieInterrompue();
+});
+window.addEventListener('pagehide', envoyerPartieInterrompue);
 
 // ==========================================
 // 4. INITIALISATION
 // ==========================================
 
 window.onload = function() {
+    renvoyerEnAttente();
+
     let sauvegarde = JSON.parse(localStorage.getItem('quiz_encours'));
 
     // Ancienne sauvegarde (avant les cours) : elle correspond aux révisions générales
