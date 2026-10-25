@@ -322,7 +322,7 @@ button.carte:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--encr
 }
 #barre-remplie { height: 100%; width: 0; background: var(--orange); transition: width .4s; }
 
-.carte-question { padding: 22px 18px; }
+.carte-question { padding: 18px 16px; }
 .theme-question {
     display: inline-block;
     margin: 0 0 8px;
@@ -338,7 +338,7 @@ button.carte:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--encr
     font-family: 'Atkinson Hyperlegible', sans-serif;
     font-size: 1.35em;
     line-height: 1.35;
-    margin: 0 0 18px;
+    margin: 0 0 14px;
 }
 
 #input-reponse,
@@ -358,12 +358,15 @@ button.carte:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--encr
 
 .feedback {
     display: flex; align-items: flex-start; gap: 12px;
-    margin-top: 16px;
-    padding: 14px 16px;
+    margin: 0 0 14px;
+    padding: 12px 14px;
     border: var(--bord);
-    border-radius: var(--rayon);
-    box-shadow: var(--relief);
+    border-radius: 16px;
 }
+
+/* Pendant le quiz : on cache le bandeau du haut pour laisser la place au clavier du téléphone */
+body.en-jeu .entete { display: none; }
+body.en-jeu .barre-haut { margin-bottom: 10px; }
 .feedback img { width: 40px; height: 40px; flex-shrink: 0; }
 .feedback strong { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 1.15em; display: block; }
 .feedback.correct { background: var(--succes-fond); }

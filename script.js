@@ -183,6 +183,7 @@ function majInfosNiveaux() {
 function afficherEcran(id) {
     ["selection-niveau", "selection-cours", "jeu", "fin", "revision"].forEach(e =>
         document.getElementById(e).style.display = (e === id ? "block" : "none"));
+    document.body.classList.toggle("en-jeu", id === "jeu");
     window.scrollTo(0, 0);
 }
 
@@ -413,6 +414,12 @@ function afficherQuestion() {
     document.getElementById("progression").innerText = `Question ${indexQuestion + 1} sur ${questionsAffichees.length}`;
     document.getElementById("barre-remplie").style.width = Math.round(100 * indexQuestion / questionsAffichees.length) + "%";
     document.getElementById("input-reponse").focus();
+    gardeVisible("btn-valider");
+}
+
+// Téléphone : le clavier réduit l'écran, on fait défiler pour garder l'élément voulu au-dessus du clavier
+function gardeVisible(id) {
+    setTimeout(() => document.getElementById(id).scrollIntoView({ block: "nearest", behavior: "smooth" }), 350);
 }
 
 function verifierReponse() {
@@ -445,6 +452,7 @@ function verifierReponse() {
     feedback.className = "feedback " + (juste ? "correct" : "erreur");
     feedback.replaceChildren(image, texte);
     feedback.style.display = "flex";
+    gardeVisible("feedback-message");
     document.getElementById("barre-remplie").style.width = Math.round(100 * (indexQuestion + 1) / questionsAffichees.length) + "%";
     sauvegarderSession();
 

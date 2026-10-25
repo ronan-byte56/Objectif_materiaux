@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
     <title>Objectif Matériaux</title>
 
     <link rel="manifest" href="manifest.json">
@@ -120,12 +120,13 @@
             <div class="carte carte-question">
                 <p class="theme-question" id="theme-question"></p>
                 <h2 id="question">Chargement…</h2>
+                <!-- Correction placée au-dessus du champ : elle reste visible quand le clavier est ouvert -->
+                <div id="feedback-message" class="feedback" style="display:none;"></div>
                 <input type="text" id="input-reponse" placeholder="Tape ta réponse" autocomplete="off" autocapitalize="off" spellcheck="false">
                 <button id="btn-valider" class="btn btn-noir btn-large" onclick="verifierReponse()">Valider</button>
             </div>
 
             <div id="notif-reprise" class="notif" style="display:none;"></div>
-            <div id="feedback-message" class="feedback" style="display:none;"></div>
 
             <button class="btn btn-contour" onclick="changerDeCours()">Changer de cours</button>
         </section>
