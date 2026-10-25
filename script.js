@@ -12,6 +12,7 @@ let timerGlobal = 0;
 let intervalTimer;
 let peutValider = true;
 let nbRepondusEnvoyes = 0; // pour n'envoyer une partie interrompue que si l'élève a avancé depuis
+let minuterieSuite = null; // passage automatique à la question suivante après la correction
 
 // Récupération de l'identité
 let prenom = localStorage.getItem('user_prenom') || "";
@@ -160,7 +161,10 @@ function choisirNiveau(niveau) {
         if (!cours.ouvert) titre.innerHTML += ' <span class="cours-badge" style="background:#888">Fermé</span>';
         const progression = document.createElement("span");
         progression.className = "cours-progression";
-        progression.innerText = `${nbReussiesDuCours(cours)} / ${cours.questions.length}`;
+        const pause = lirePauses()[cours.id];
+        progression.innerText = pause
+            ? `⏸ reprendre ${pause.index + 1}/${pause.questions.length}`
+            : `${nbReussiesDuCours(cours)} / ${cours.questions.length}`;
         btn.append(titre, progression);
         btn.onclick = () => lancerCours(niveau, cours.id);
         liste.appendChild(btn);
@@ -182,9 +186,16 @@ function lancerCours(niveau, idCours) {
     niveauActuel = niveau;
     coursActuel = cours;
 
-    const sauvegarde = JSON.parse(localStorage.getItem('quiz_encours'));
+    // Reprise : partie en cours (app rouverte) ou partie mise en pause (changement de cours)
+    const encours = JSON.parse(localStorage.getItem('quiz_encours'));
+    const pauses = lirePauses();
+    const sauvegarde = (encours && encours.niveau === niveau && encours.cours === idCours) ? encours : pauses[idCours];
+    if (pauses[idCours]) {
+        delete pauses[idCours];
+        localStorage.setItem('quiz_pauses', JSON.stringify(pauses));
+    }
 
-    if (sauvegarde && sauvegarde.niveau === niveau && sauvegarde.cours === idCours) {
+    if (sauvegarde) {
         questionsAffichees = sauvegarde.questions;
         indexQuestion = sauvegarde.index;
         score = sauvegarde.score;
@@ -218,8 +229,8 @@ function lancerCours(niveau, idCours) {
     afficherQuestion();
 }
 
-function sauvegarderSession() {
-    const etat = {
+function etatSession() {
+    return {
         niveau: niveauActuel,
         cours: coursActuel.id,
         questions: questionsAffichees,
@@ -228,7 +239,44 @@ function sauvegarderSession() {
         timer: timerGlobal,
         envoyes: nbRepondusEnvoyes
     };
-    localStorage.setItem('quiz_encours', JSON.stringify(etat));
+}
+
+function sauvegarderSession() {
+    localStorage.setItem('quiz_encours', JSON.stringify(etatSession()));
+}
+
+// Parties mises en pause quand l'élève change de cours (une par cours)
+function lirePauses() {
+    return JSON.parse(localStorage.getItem('quiz_pauses')) || {};
+}
+
+// Bouton "Changer de cours" : on met la partie en pause et on revient à la liste des cours
+function changerDeCours() {
+    if (!coursActuel) return;
+    envoyerPartieInterrompue(); // le prof voit le travail déjà fait
+
+    // Correction affichée : on passe à la question suivante sans attendre
+    clearTimeout(minuterieSuite);
+    if (!peutValider) {
+        indexQuestion++;
+        peutValider = true;
+    }
+    document.getElementById("feedback-message").style.display = "none";
+    clearInterval(intervalTimer);
+
+    if (indexQuestion >= questionsAffichees.length) {
+        terminerQuiz(); // il venait de répondre à la dernière question
+        return;
+    }
+
+    const pauses = lirePauses();
+    pauses[coursActuel.id] = etatSession();
+    localStorage.setItem('quiz_pauses', JSON.stringify(pauses));
+    localStorage.removeItem('quiz_encours');
+    coursActuel = null;
+
+    document.getElementById("jeu").style.display = "none";
+    choisirNiveau(niveauActuel);
 }
 
 function afficherQuestion() {
@@ -270,7 +318,7 @@ function verifierReponse() {
     feedback.style.display = "block";
     sauvegarderSession();
 
-    setTimeout(() => {
+    minuterieSuite = setTimeout(() => {
         feedback.style.display = "none";
         indexQuestion++;
         if (indexQuestion < questionsAffichees.length) {
@@ -296,6 +344,9 @@ function lancerTimer() {
 function terminerQuiz() {
     clearInterval(intervalTimer);
     localStorage.removeItem('quiz_encours');
+    const pauses = lirePauses();
+    delete pauses[coursActuel.id];
+    localStorage.setItem('quiz_pauses', JSON.stringify(pauses));
 
     const progressionCours = `${nbReussiesDuCours(coursActuel)} / ${coursActuel.questions.length}`;
     const m = Math.floor(timerGlobal / 60);
