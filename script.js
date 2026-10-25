@@ -181,7 +181,7 @@ function majInfosNiveaux() {
 }
 
 function afficherEcran(id) {
-    ["selection-niveau", "selection-cours", "jeu", "fin"].forEach(e =>
+    ["selection-niveau", "selection-cours", "jeu", "fin", "revision"].forEach(e =>
         document.getElementById(e).style.display = (e === id ? "block" : "none"));
     window.scrollTo(0, 0);
 }
@@ -201,7 +201,8 @@ function choisirNiveau(niveau) {
     const liste = document.getElementById("liste-cours");
     liste.innerHTML = "";
     coursVisibles(niveau).forEach((cours, i) => {
-        const btn = element("button", `carte carte-ligne ${COULEURS_COURS[i % COULEURS_COURS.length]}${cours.ouvert ? "" : " cours-ferme"}`);
+        const carte = element("div", `carte carte-cours ${COULEURS_COURS[i % COULEURS_COURS.length]}${cours.ouvert ? "" : " cours-ferme"}`);
+        const haut = element("div", "haut carte-ligne");
         const image = element("img", "illu");
         image.src = illu(illuCours(cours));
         image.alt = "";
@@ -222,12 +223,73 @@ function choisirNiveau(niveau) {
         barre.append(rempli);
         texte.append(barre);
 
-        btn.append(image, texte, element("span", "fleche", "›"));
-        btn.onclick = () => lancerCours(niveau, cours.id);
-        liste.appendChild(btn);
+        haut.append(image, texte);
+
+        // Deux actions : jouer le quiz, ou revoir toutes les questions (pour en parler entre élèves)
+        const actions = element("div", "actions-cours");
+        const jouer = element("button", "btn btn-noir", pause ? "Reprendre" : "Jouer");
+        jouer.onclick = () => lancerCours(niveau, cours.id);
+        const revoir = element("button", "btn btn-blanc", "Revoir");
+        revoir.onclick = () => afficherRevision(niveau, cours.id);
+        actions.append(jouer, revoir);
+
+        carte.append(haut, actions);
+        liste.appendChild(carte);
     });
 
     afficherEcran("selection-cours");
+}
+
+// Écran "Revoir les questions" : chaque question sur une carte, réponse cachée derrière un bouton.
+// Seules les questions déjà réussies dans le quiz ont leur réponse consultable (choix du prof).
+let toutesVisibles = false;
+
+function afficherRevision(niveau, idCours) {
+    const cours = trouverCours(niveau, idCours);
+    if (!cours) return;
+    niveauActuel = niveau;
+    toutesVisibles = false;
+    document.getElementById("titre-revision").innerText = cours.titre;
+    const nbReussies = nbReussiesDuCours(cours);
+    document.getElementById("info-revision").innerText = nbReussies === 0
+        ? `${cours.questions.length} questions · réussis-les dans le quiz pour débloquer leurs réponses`
+        : `${nbReussies} réponse${nbReussies > 1 ? "s" : ""} débloquée${nbReussies > 1 ? "s" : ""} sur ${cours.questions.length} · les autres se débloquent quand tu les réussis dans le quiz`;
+    document.getElementById("btn-tout-voir").innerText = "Afficher mes réponses";
+    document.getElementById("btn-tout-voir").style.display = nbReussies > 0 ? "block" : "none";
+    document.getElementById("btn-jouer-revision").onclick = () => lancerCours(niveau, idCours);
+
+    const liste = document.getElementById("liste-revision");
+    liste.innerHTML = "";
+    cours.questions.forEach((q, i) => {
+        const carte = element("div", "carte carte-revision");
+        const entete = element("div", "entete-revision");
+        entete.append(element("span", "numero", String(i + 1)));
+        const separation = q.q.match(/^([^:?]{2,40}?)\s*:\s*(.+)$/);
+        if (separation) entete.append(element("span", "theme-question", separation[1]));
+        const reussie = questionsReussies.includes(q.q);
+        if (reussie) entete.append(element("span", "reussie", "Réussie"));
+        carte.append(entete, element("p", "texte-question", separation ? separation[2] : q.q));
+
+        if (reussie) {
+            const reponse = element("div", "reponse-revision", q.r);
+            reponse.style.display = "none";
+            const voir = element("button", "btn btn-voir", "Voir la réponse");
+            voir.onclick = () => { voir.style.display = "none"; reponse.style.display = "block"; };
+            carte.append(voir, reponse);
+        } else {
+            // La réponse n'est même pas dans la page tant que la question n'est pas réussie
+            carte.append(element("div", "verrou", "Réponse bloquée : réussis cette question dans le quiz"));
+        }
+        liste.appendChild(carte);
+    });
+    afficherEcran("revision");
+}
+
+function basculerToutesReponses() {
+    toutesVisibles = !toutesVisibles;
+    document.querySelectorAll("#liste-revision .btn-voir").forEach(b => b.style.display = toutesVisibles ? "none" : "block");
+    document.querySelectorAll("#liste-revision .reponse-revision").forEach(r => r.style.display = toutesVisibles ? "block" : "none");
+    document.getElementById("btn-tout-voir").innerText = toutesVisibles ? "Cacher mes réponses" : "Afficher mes réponses";
 }
 
 function retourNiveaux() {
@@ -435,6 +497,7 @@ function terminerQuiz() {
             </div>
             <p id="statut-envoi">Envoi de tes résultats au prof…</p>
             <button class="btn btn-noir btn-large" onclick="continuerCours()">Continuer ce cours</button>
+            <button class="btn btn-contour" onclick="afficherRevision(niveauActuel, coursActuel.id)">Revoir les questions</button>
             <button class="btn btn-contour" onclick="choisirNiveau(niveauActuel)">Retour aux cours</button>
         </div>
     `;

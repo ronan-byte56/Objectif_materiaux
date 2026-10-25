@@ -130,6 +130,18 @@
             <button class="btn btn-contour" onclick="changerDeCours()">Changer de cours</button>
         </section>
 
+        <!-- Écran "Revoir les questions" : toutes les questions d'un cours, réponses cachées -->
+        <section id="revision" style="display:none;">
+            <div class="barre-haut">
+                <button class="btn btn-rond" onclick="choisirNiveau(niveauActuel)" aria-label="Retour aux cours">‹</button>
+                <h2 class="titre-section" id="titre-revision"></h2>
+            </div>
+            <p class="sous-titre gauche" id="info-revision"></p>
+            <button class="btn btn-contour btn-tout" id="btn-tout-voir" onclick="basculerToutesReponses()">Afficher toutes les réponses</button>
+            <div class="liste" id="liste-revision"></div>
+            <button class="btn btn-noir btn-large btn-bas" id="btn-jouer-revision">Jouer ce cours</button>
+        </section>
+
         <!-- Écran 4 : fin du quiz -->
         <section id="fin" style="display:none;"></section>
     </div>

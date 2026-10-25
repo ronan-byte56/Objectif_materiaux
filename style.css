@@ -191,6 +191,67 @@ button.carte:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--encr
 .etiquette-cours.ferme { background: var(--encre); color: var(--blanc); }
 .carte.cours-ferme { opacity: .6; border-style: dashed; }
 
+/* Carte de cours avec ses deux boutons (Jouer / Revoir) */
+.carte-cours { display: flex; flex-direction: column; gap: 14px; }
+.carte-cours .haut { display: flex; align-items: center; gap: 14px; }
+.actions-cours { display: flex; gap: 10px; }
+.actions-cours .btn { flex: 1; padding: 10px 12px; font-size: 1em; }
+.btn-blanc {
+    background: var(--blanc);
+    color: var(--encre);
+    border: var(--bord);
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+}
+
+/* ---------- Écran "Revoir les questions" ---------- */
+.btn-tout { margin: 0 0 16px; }
+.btn-bas { margin-top: 22px; }
+.carte-revision { padding: 16px; }
+.carte-revision .entete-revision { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+.numero {
+    width: 30px; height: 30px; flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--encre); color: var(--blanc);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: .9em;
+}
+.carte-revision .theme-question { margin: 0; }
+.reussie {
+    margin-left: auto;
+    font-size: .78em; font-weight: 700;
+    color: var(--succes);
+    background: var(--succes-fond);
+    border: 1.5px solid var(--succes);
+    border-radius: 999px;
+    padding: 1px 9px;
+}
+.carte-revision .texte-question { font-weight: 700; font-size: 1.1em; line-height: 1.35; margin: 4px 0 12px; }
+.btn-voir {
+    width: 100%;
+    background: var(--fond);
+    color: var(--encre);
+    border: 1.5px dashed var(--encre);
+    border-radius: 14px;
+    padding: 10px;
+    font-weight: 700;
+}
+.verrou {
+    background: var(--fond);
+    color: var(--encre-douce);
+    border-radius: 14px;
+    padding: 10px 12px;
+    font-size: .92em;
+    text-align: center;
+}
+.carte-revision:has(.verrou) { background: #F6F7FB; }
+.reponse-revision {
+    background: var(--jaune);
+    border: 1.5px solid var(--encre);
+    border-radius: 14px;
+    padding: 10px 12px;
+}
+
 /* ---------- Boutons ---------- */
 .btn {
     font: inherit;
