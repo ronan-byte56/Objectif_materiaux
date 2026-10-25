@@ -4,114 +4,137 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Objectif Matériaux</title>
-    
+
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#3498db">
+    <meta name="theme-color" content="#EEF3FF">
     <link rel="apple-touch-icon" href="logo.png">
-    
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Petit ajout pour styliser les nouveaux champs */
-        .input-identite {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .input-identite input {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid #3498db;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-    </style>
 </head>
-   
+
 <body>
 
+    <!-- Accueil : identité + conseils (au premier lancement) -->
     <div id="welcome-modal" class="modal">
         <div class="modal-content">
-            <h2>📖 Guide de Survie : Le Quiz "Objectif Matériaux"</h2>
-            
+            <img class="modal-illu" data-illu="Waving hand/Default/3D/waving_hand_3d_default.png" alt="">
+            <h2 class="titre-rond">Bienvenue !</h2>
+            <p class="sous-titre">Le guide de survie du quiz «&nbsp;Objectif Matériaux&nbsp;»</p>
+
             <div id="section-identification">
-                <p><i>Pour commencer, identifie-toi :</i></p>
+                <p class="etiquette">Pour commencer, identifie-toi</p>
                 <div class="input-identite">
                     <input type="text" id="user-prenom" placeholder="Prénom" autocomplete="given-name">
                     <input type="text" id="user-nom" placeholder="Nom" autocomplete="family-name">
                 </div>
             </div>
 
-            <p><i>Pour obtenir ton 20/20 et valider tes acquis, suis ces quelques conseils :</i></p>
-            
-            <div class="guide-item">
-                <p>🎯 <strong>Vise les mots-clés :</strong> L'application cherche l'idée principale. Pas besoin de faire des phrases complètes. Tape <strong>"lunettes"</strong> plutôt que "Je dois mettre mes lunettes de sécurité".</p>
-            </div>
-            <div class="guide-item">
-                <p>🪄 <strong>L'orthographe (presque) libre :</strong> Ton prof a rendu l'IA sympa ! Elle accepte souvent les mots même s'il manque un "s" ou si tu oublies un accent.</p>
-            </div>
-            <div class="guide-item">
-                <p>📟 <strong>Mots courts autorisés :</strong> Pour certaines questions complexes, les sigles fonctionnent (ex: <strong>"EPI"</strong>, <strong>"PP"</strong>, <strong>"PVC"</strong>).</p>
-            </div>
-            <div class="guide-item">
-                <p>👹 <strong>Pas de panique en cas d'erreur :</strong> Si tu te trompes, l'application te donne la réponse et remet la question dans ton sac pour plus tard. Elle ne disparaîtra que quand tu l'auras réussie !</p>
-            </div>
-            <div class="guide-item">
-                <p>🔋 <strong>Sauvegarde automatique :</strong> Si tu fermes l'onglet, le jeu se souviendra de ton score. Tu pourras reprendre là où tu t'es arrêté.</p>
-            </div>
+            <p class="etiquette">Pour obtenir ton 20/20, suis ces conseils</p>
+            <ul class="conseils">
+                <li><img data-illu="Bullseye/3D/bullseye_3d.png" alt=""><span><strong>Vise les mots-clés.</strong> Pas besoin de faire des phrases : tape «&nbsp;lunettes&nbsp;» plutôt que «&nbsp;Je dois mettre mes lunettes de sécurité&nbsp;».</span></li>
+                <li><img data-illu="Pencil/3D/pencil_3d.png" alt=""><span><strong>L'orthographe (presque) libre.</strong> Un «&nbsp;s&nbsp;» oublié ou un accent manquant, ça passe souvent.</span></li>
+                <li><img data-illu="Card index dividers/3D/card_index_dividers_3d.png" alt=""><span><strong>Les sigles marchent.</strong> Par exemple «&nbsp;EPI&nbsp;», «&nbsp;PP&nbsp;», «&nbsp;PVC&nbsp;».</span></li>
+                <li><img data-illu="Light bulb/3D/light_bulb_3d.png" alt=""><span><strong>Pas de panique en cas d'erreur.</strong> L'app te donne la réponse et te repose la question plus tard, jusqu'à ce que tu la réussisses.</span></li>
+                <li><img data-illu="Rocket/3D/rocket_3d.png" alt=""><span><strong>Sauvegarde automatique.</strong> Tu peux fermer l'app ou changer de cours : tu reprendras là où tu t'es arrêté.</span></li>
+                <li class="secret"><img data-illu="Fire/3D/fire_3d.png" alt=""><span><strong>Le petit secret du prof :</strong> n'oublie jamais les unités (mm, kg…). Sinon, c'est la bulle assurée !</span></li>
+            </ul>
 
-            <div class="guide-item">
-    <p>⚠️ <strong>LE PETIT SECRET DU PROF :</strong> N'oublie JAMAIS les unités dans tes réponses (mm, kg, etc.). Sinon, c'est la bulle assurée ! 😉</p>
-</div>
-            
-            <button class="btn-start" onclick="validerEtFermer()">J'ai compris, c'est parti !</button>
-            <div class="modal-footer">
-                <label><input type="checkbox" id="nePlusAfficher"> Ne plus afficher ce guide au démarrage</label>
-            </div>
+            <button class="btn btn-noir btn-large" onclick="validerEtFermer()">C'est parti</button>
+            <label class="case"><input type="checkbox" id="nePlusAfficher"> Ne plus afficher ce guide au démarrage</label>
         </div>
     </div>
 
     <div class="container">
-        <header>
-            <h1>Objectif Matériaux</h1>
-        </header>
 
-        <div id="selection-niveau">
-            <p class="subtitle">Choisis ton niveau :</p>
-            <div class="btn-group">
-                <button class="btn-lvl" onclick="choisirNiveau('seconde')">Seconde</button>
-                <button class="btn-lvl" onclick="choisirNiveau('premiere')">Première</button>
-                <button class="btn-lvl" onclick="choisirNiveau('terminale')">Terminale</button>
-            </div>
-        </div>
-
-        <div id="selection-cours" style="display:none;">
-            <p class="subtitle" id="titre-niveau">Choisis ton cours :</p>
-            <div class="btn-group" id="liste-cours"></div>
-            <button class="btn-retour" onclick="retourNiveaux()">← Changer de niveau</button>
-        </div>
-
-        <div id="jeu" style="display:none;">
-            <div class="quiz-stats">
-                <span id="timer">Temps : 0m 00s</span>
-                <span id="progression">Question 1 / 20</span>
-            </div>
-            <p id="titre-cours-jeu" class="titre-cours-jeu"></p>
-            
-            <div class="card">
-                <h2 id="question">Chargement...</h2>
-                <div class="input-box">
-                    <input type="text" id="input-reponse" placeholder="Tape ta réponse..." autocomplete="off">
-                    <button id="btn-valider" class="btn-go" onclick="verifierReponse()">Valider</button>
+        <!-- Bandeau du haut : élève + diamants (questions réussies) -->
+        <header class="entete">
+            <div class="eleve">
+                <div class="avatar" id="avatar"></div>
+                <div>
+                    <div class="salut" id="salut">Salut !</div>
+                    <div class="role">Élève</div>
                 </div>
             </div>
-             <div id="notif-reprise" class="notif-reprise" style="display:none;">🚀 Reprise de ta partie en cours !</div>
+            <div class="pastille" title="Questions réussies">
+                <img data-illu="Gem stone/3D/gem_stone_3d.png" alt="">
+                <span id="total-diamants">0</span>
+            </div>
+        </header>
+
+        <!-- Écran 1 : choix du niveau -->
+        <section id="selection-niveau">
+            <div class="carte heros fond-bleu">
+                <div>
+                    <h1 class="titre-rond">Objectif<br>Matériaux</h1>
+                    <p>Révise tes cours d'atelier, une question à la fois.</p>
+                </div>
+                <img class="heros-illu" data-illu="Trophy/3D/trophy_3d.png" alt="">
+            </div>
+
+            <h2 class="titre-section">Choisis ton niveau</h2>
+            <div class="liste">
+                <button class="carte carte-ligne fond-jaune" onclick="choisirNiveau('seconde')">
+                    <img class="illu" data-illu="Pencil/3D/pencil_3d.png" alt="">
+                    <span class="carte-texte"><span class="carte-titre">Seconde</span><span class="carte-info" id="info-seconde"></span></span>
+                    <span class="fleche">›</span>
+                </button>
+                <button class="carte carte-ligne fond-vert" onclick="choisirNiveau('premiere')">
+                    <img class="illu" data-illu="Hammer and wrench/3D/hammer_and_wrench_3d.png" alt="">
+                    <span class="carte-texte"><span class="carte-titre">Première</span><span class="carte-info" id="info-premiere"></span></span>
+                    <span class="fleche">›</span>
+                </button>
+                <button class="carte carte-ligne fond-rose" onclick="choisirNiveau('terminale')">
+                    <img class="illu" data-illu="Graduation cap/3D/graduation_cap_3d.png" alt="">
+                    <span class="carte-texte"><span class="carte-titre">Terminale</span><span class="carte-info" id="info-terminale"></span></span>
+                    <span class="fleche">›</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Écran 2 : les cours du niveau -->
+        <section id="selection-cours" style="display:none;">
+            <div class="barre-haut">
+                <button class="btn btn-rond" onclick="retourNiveaux()" aria-label="Changer de niveau">‹</button>
+                <h2 class="titre-section" id="titre-niveau">Seconde</h2>
+            </div>
+            <p class="sous-titre gauche">Choisis le cours à réviser</p>
+            <div class="liste" id="liste-cours"></div>
+        </section>
+
+        <!-- Écran 3 : le quiz -->
+        <section id="jeu" style="display:none;">
+            <div class="barre-haut">
+                <button class="btn btn-rond" onclick="changerDeCours()" aria-label="Changer de cours">‹</button>
+                <p id="titre-cours-jeu" class="titre-cours-jeu"></p>
+            </div>
+
+            <div class="quiz-stats">
+                <span id="progression">Question 1 sur 20</span>
+                <span class="pastille petite"><img data-illu="Hourglass not done/3D/hourglass_not_done_3d.png" alt=""><span id="timer">0:00</span></span>
+            </div>
+            <div class="barre-progression"><div id="barre-remplie"></div></div>
+
+            <div class="carte carte-question">
+                <p class="theme-question" id="theme-question"></p>
+                <h2 id="question">Chargement…</h2>
+                <input type="text" id="input-reponse" placeholder="Tape ta réponse" autocomplete="off" autocapitalize="off" spellcheck="false">
+                <button id="btn-valider" class="btn btn-noir btn-large" onclick="verifierReponse()">Valider</button>
+            </div>
+
+            <div id="notif-reprise" class="notif" style="display:none;"></div>
             <div id="feedback-message" class="feedback" style="display:none;"></div>
-            <button class="btn-retour" onclick="changerDeCours()">← Changer de cours</button>
-        </div>
+
+            <button class="btn btn-contour" onclick="changerDeCours()">Changer de cours</button>
+        </section>
+
+        <!-- Écran 4 : fin du quiz -->
+        <section id="fin" style="display:none;"></section>
     </div>
 
     <script src="questions.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
-

@@ -24,6 +24,26 @@ const modeProf = new URLSearchParams(location.search).has('prof');
 const NOMS_NIVEAUX = { seconde: "Seconde", premiere: "Première", terminale: "Terminale" };
 const JOURS_NOUVEAU = 14; // un cours ouvert depuis moins de 14 jours porte le badge "Nouveau"
 
+// Illustrations 3D : Fluent Emoji de Microsoft (licence MIT), version figée
+const URL_ILLUS = "https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@1ffb34c752ecf5d402f04cfb4b392c77f57c54bc/assets/";
+function illu(chemin) { return URL_ILLUS + chemin.split("/").map(encodeURIComponent).join("/"); }
+
+// Illustration d'un cours : champ "icone" du cours, sinon d'après les mots du titre
+const ILLUS_COURS = [
+    [/verre/i, "Test tube/3D/test_tube_3d.png"],
+    [/renfort|fibre|tissu/i, "Yarn/3D/yarn_3d.png"],
+    [/histoire|économie/i, "Scroll/3D/scroll_3d.png"],
+    [/sécurité|hse|epi/i, "Safety vest/3D/safety_vest_3d.png"],
+    [/injection|presse|moule/i, "Gear/3D/gear_3d.png"],
+    [/révision/i, "Books/3D/books_3d.png"]
+];
+function illuCours(cours) {
+    if (cours.icone) return cours.icone;
+    const trouve = ILLUS_COURS.find(([motif]) => motif.test(cours.titre));
+    return trouve ? trouve[1] : "Hammer and wrench/3D/hammer_and_wrench_3d.png";
+}
+const COULEURS_COURS = ["fond-bleu", "fond-rose", "fond-vert", "fond-jaune", "fond-violet", "fond-peche"];
+
 // Google Apps Script du prof : reçoit les résultats et les écrit dans son Google Sheet
 const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbw7JK1wl4VxaUVSlm1m0YLLmOH_HpiXnd20TI-SxlBQmSaDh6jigjSS7KLAsFesAbTg/exec";
 
@@ -116,6 +136,7 @@ function validerEtFermer() {
     }
 
     document.getElementById('welcome-modal').style.display = "none";
+    majEntete();
 
     // Si une partie est en cours, on affiche la notif personnalisée
     if (localStorage.getItem('quiz_encours')) {
@@ -145,38 +166,73 @@ function estNouveau(cours) {
     return jours < JOURS_NOUVEAU;
 }
 
+// Bandeau du haut : initiales, "Salut Prénom", diamants = questions réussies
+function majEntete() {
+    document.getElementById("avatar").innerText = ((prenom[0] || "") + (nom[0] || "")).toUpperCase() || "?";
+    document.getElementById("salut").innerText = prenom ? `Salut ${prenom} !` : "Salut !";
+    document.getElementById("total-diamants").innerText = questionsReussies.length;
+}
+
+// Écran 1 : nombre de cours ouverts sous chaque niveau
+function majInfosNiveaux() {
+    Object.keys(NOMS_NIVEAUX).forEach(niveau => {
+        document.getElementById("info-" + niveau).innerText = `${coursVisibles(niveau).length} cours à réviser`;
+    });
+}
+
+function afficherEcran(id) {
+    ["selection-niveau", "selection-cours", "jeu", "fin"].forEach(e =>
+        document.getElementById(e).style.display = (e === id ? "block" : "none"));
+    window.scrollTo(0, 0);
+}
+
+function element(balise, classe, texte) {
+    const el = document.createElement(balise);
+    if (classe) el.className = classe;
+    if (texte !== undefined) el.innerText = texte;
+    return el;
+}
+
 // Écran 2 : la liste des cours du niveau choisi
 function choisirNiveau(niveau) {
     niveauActuel = niveau;
-    document.getElementById("titre-niveau").innerText = `${NOMS_NIVEAUX[niveau]} : choisis ton cours`;
+    document.getElementById("titre-niveau").innerText = NOMS_NIVEAUX[niveau];
 
     const liste = document.getElementById("liste-cours");
     liste.innerHTML = "";
-    coursVisibles(niveau).forEach(cours => {
-        const btn = document.createElement("button");
-        btn.className = "btn-cours" + (cours.ouvert ? "" : " ferme");
-        const titre = document.createElement("span");
-        titre.innerText = "📁 " + cours.titre;
-        if (estNouveau(cours)) titre.innerHTML += ' <span class="cours-badge">Nouveau</span>';
-        if (!cours.ouvert) titre.innerHTML += ' <span class="cours-badge" style="background:#888">Fermé</span>';
-        const progression = document.createElement("span");
-        progression.className = "cours-progression";
+    coursVisibles(niveau).forEach((cours, i) => {
+        const btn = element("button", `carte carte-ligne ${COULEURS_COURS[i % COULEURS_COURS.length]}${cours.ouvert ? "" : " cours-ferme"}`);
+        const image = element("img", "illu");
+        image.src = illu(illuCours(cours));
+        image.alt = "";
+
+        const texte = element("span", "carte-texte");
+        if (estNouveau(cours)) texte.append(element("span", "etiquette-cours nouveau", "Nouveau"));
+        if (!cours.ouvert) texte.append(element("span", "etiquette-cours ferme", "Fermé (aperçu prof)"));
+        texte.append(element("span", "carte-titre", cours.titre));
+
         const pause = lirePauses()[cours.id];
-        progression.innerText = pause
-            ? `⏸ reprendre ${pause.index + 1}/${pause.questions.length}`
-            : `${nbReussiesDuCours(cours)} / ${cours.questions.length}`;
-        btn.append(titre, progression);
+        const reussies = nbReussiesDuCours(cours);
+        texte.append(element("span", "carte-info", pause
+            ? `En pause : reprends à la question ${pause.index + 1} sur ${pause.questions.length}`
+            : `${reussies} question${reussies > 1 ? "s" : ""} réussie${reussies > 1 ? "s" : ""} sur ${cours.questions.length}`));
+        const barre = element("span", "mini-barre");
+        const rempli = element("div");
+        rempli.style.width = Math.round(100 * reussies / cours.questions.length) + "%";
+        barre.append(rempli);
+        texte.append(barre);
+
+        btn.append(image, texte, element("span", "fleche", "›"));
         btn.onclick = () => lancerCours(niveau, cours.id);
         liste.appendChild(btn);
     });
 
-    document.getElementById("selection-niveau").style.display = "none";
-    document.getElementById("selection-cours").style.display = "block";
+    afficherEcran("selection-cours");
 }
 
 function retourNiveaux() {
-    document.getElementById("selection-cours").style.display = "none";
-    document.getElementById("selection-niveau").style.display = "block";
+    majInfosNiveaux();
+    afficherEcran("selection-niveau");
 }
 
 // Écran 3 : le quiz d'un cours
@@ -222,10 +278,9 @@ function lancerCours(niveau, idCours) {
         nbRepondusEnvoyes = 0;
     }
 
-    document.getElementById("titre-cours-jeu").innerText = "📁 " + cours.titre;
-    document.getElementById("selection-niveau").style.display = "none";
-    document.getElementById("selection-cours").style.display = "none";
-    document.getElementById("jeu").style.display = "block";
+    document.getElementById("titre-cours-jeu").innerText = cours.titre;
+    document.getElementById("feedback-message").style.display = "none";
+    afficherEcran("jeu");
 
     lancerTimer();
     afficherQuestion();
@@ -277,7 +332,6 @@ function changerDeCours() {
     localStorage.removeItem('quiz_encours');
     coursActuel = null;
 
-    document.getElementById("jeu").style.display = "none";
     choisirNiveau(niveauActuel);
 }
 
@@ -288,9 +342,14 @@ function afficherQuestion() {
     }
     sauvegarderSession();
     const q = questionsAffichees[indexQuestion];
-    document.getElementById("question").innerText = q.q;
+    // "THÈME : question" -> le thème va dans la pastille au-dessus de la question
+    const separation = q.q.match(/^([^:?]{2,40}?)\s*:\s*(.+)$/);
+    document.getElementById("theme-question").innerText = separation ? separation[1] : "";
+    document.getElementById("theme-question").style.display = separation ? "inline-block" : "none";
+    document.getElementById("question").innerText = separation ? separation[2] : q.q;
     document.getElementById("input-reponse").value = "";
-    document.getElementById("progression").innerText = `Question ${indexQuestion + 1} / ${questionsAffichees.length}`;
+    document.getElementById("progression").innerText = `Question ${indexQuestion + 1} sur ${questionsAffichees.length}`;
+    document.getElementById("barre-remplie").style.width = Math.round(100 * indexQuestion / questionsAffichees.length) + "%";
     document.getElementById("input-reponse").focus();
 }
 
@@ -304,20 +363,27 @@ function verifierReponse() {
     peutValider = false;
     const q = questionsAffichees[indexQuestion];
 
-    if (reponseCorrecte(saisie, q.a)) {
+    const juste = reponseCorrecte(saisie, q.a);
+    if (juste) {
         score++;
         if (!questionsReussies.includes(q.q)) {
             questionsReussies.push(q.q);
             localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
         }
-        feedback.className = "feedback correct";
-        feedback.innerHTML = "✅ BIEN JOUÉ " + prenom.toUpperCase() + " !<br><small>" + q.r + "</small>";
-    } else {
-        feedback.className = "feedback erreur";
-        feedback.innerHTML = "❌ PAS TOUT À FAIT...<br><small>Réponse attendue : " + q.r + "</small>";
+        majEntete();
     }
-
-    feedback.style.display = "block";
+    const image = element("img");
+    image.src = illu(juste ? "Check mark button/3D/check_mark_button_3d.png" : "Cross mark/3D/cross_mark_3d.png");
+    image.alt = "";
+    const texte = element("div");
+    texte.append(
+        element("strong", "", juste ? (prenom ? `Bien joué ${prenom} !` : "Bien joué !") : "Pas tout à fait…"),
+        element("span", "", (juste ? "" : "Réponse attendue : ") + q.r)
+    );
+    feedback.className = "feedback " + (juste ? "correct" : "erreur");
+    feedback.replaceChildren(image, texte);
+    feedback.style.display = "flex";
+    document.getElementById("barre-remplie").style.width = Math.round(100 * (indexQuestion + 1) / questionsAffichees.length) + "%";
     sauvegarderSession();
 
     minuterieSuite = setTimeout(() => {
@@ -338,7 +404,7 @@ function lancerTimer() {
         timerGlobal++;
         const m = Math.floor(timerGlobal / 60);
         const s = timerGlobal % 60;
-        document.getElementById("timer").innerText = `Temps : ${m}m ${s < 10 ? "0" + s : s}s`;
+        document.getElementById("timer").innerText = `${m}:${s < 10 ? "0" + s : s}`;
         if (timerGlobal % 5 === 0) sauvegarderSession();
     }, 1000);
 }
@@ -350,25 +416,39 @@ function terminerQuiz() {
     delete pauses[coursActuel.id];
     localStorage.setItem('quiz_pauses', JSON.stringify(pauses));
 
-    const progressionCours = `${nbReussiesDuCours(coursActuel)} / ${coursActuel.questions.length}`;
     const m = Math.floor(timerGlobal / 60);
     const s = timerGlobal % 60;
+    const reussite = score / questionsAffichees.length;
 
-    document.getElementById("jeu").innerHTML = `
-        <div class="card" style="text-align:center;">
-            <h2>🏆 OBJECTIF ATTEINT ${prenom.toUpperCase()} !</h2>
-            <p style="font-size: 1.4em; color: #3498db;"><strong>${coursActuel.titre}</strong><br><small>${NOMS_NIVEAUX[niveauActuel]}</small></p>
-            <p style="font-size: 1.2em;">Score de la session : <span style="color: #2ecc71;">${score} / ${questionsAffichees.length}</span></p>
-            <p>Progression sur ce cours : <span style="color: #2ecc71;">${progressionCours}</span></p>
-            <p>Temps : ${m}m ${s < 10 ? "0"+s : s}s</p>
-            <hr style="margin: 25px auto; border-color: #eee;">
-            <p id="statut-envoi">📤 Envoi de tes résultats au prof…</p>
-            <button class="btn-lvl" onclick="location.reload()" style="background:none; color:#555; border:1px solid #ccc;">Retour au menu</button>
+    // Écran 4 : bilan (le texte vient de l'élève et des cours : on passe par innerText)
+    const fin = document.getElementById("fin");
+    fin.innerHTML = `
+        <div class="carte fin-carte ${reussite >= 0.5 ? "fond-vert" : "fond-peche"}">
+            <img class="fin-illu" src="${illu(reussite >= 0.5 ? "Trophy/3D/trophy_3d.png" : "Glowing star/3D/glowing_star_3d.png")}" alt="">
+            <h2 class="titre-rond" id="fin-titre"></h2>
+            <p id="fin-cours"></p>
+            <div class="fin-score">${score}<span style="font-size:.45em"> / ${questionsAffichees.length}</span></div>
+            <p>bonnes réponses</p>
+            <div class="fin-stats">
+                <span class="pastille"><img src="${illu("Gem stone/3D/gem_stone_3d.png")}" alt="">${nbReussiesDuCours(coursActuel)} / ${coursActuel.questions.length} du cours</span>
+                <span class="pastille"><img src="${illu("Hourglass not done/3D/hourglass_not_done_3d.png")}" alt="">${m}:${s < 10 ? "0" + s : s}</span>
+            </div>
+            <p id="statut-envoi">Envoi de tes résultats au prof…</p>
+            <button class="btn btn-noir btn-large" onclick="continuerCours()">Continuer ce cours</button>
+            <button class="btn btn-contour" onclick="choisirNiveau(niveauActuel)">Retour aux cours</button>
         </div>
     `;
+    document.getElementById("fin-titre").innerText = (reussite >= 0.5 ? "Bravo" : "Bien essayé") + (prenom ? " " + prenom : "") + " !";
+    document.getElementById("fin-cours").innerText = `${coursActuel.titre} · ${NOMS_NIVEAUX[niveauActuel]}`;
+    afficherEcran("fin");
 
     // Envoi automatique : l'élève n'a plus rien à cliquer
     envoyerResultats(donneesResultats("terminé"));
+}
+
+// Bouton "Continuer ce cours" : une nouvelle série avec les questions pas encore réussies
+function continuerCours() {
+    lancerCours(niveauActuel, coursActuel.id);
 }
 
 // ==========================================
@@ -392,13 +472,14 @@ function donneesResultats(statut) {
 
 function envoyerResultats(donnees) {
     const statut = document.getElementById("statut-envoi");
+    if (!prenom) return; // pas d'identité (page de test) : rien n'est envoyé au Sheet
     fetch(URL_SCRIPT, { method: "POST", mode: "no-cors", body: JSON.stringify(donnees) })
         .then(() => {
-            if (statut) statut.innerText = "✅ Tes résultats ont été envoyés au prof.";
+            if (statut) statut.innerText = "Tes résultats ont été envoyés au prof.";
         })
         .catch(() => {
             mettreEnAttente(donnees);
-            if (statut) statut.innerText = "📶 Pas de connexion : tes résultats partiront tout seuls à la prochaine ouverture de l'app.";
+            if (statut) statut.innerText = "Pas de connexion : tes résultats partiront tout seuls à la prochaine ouverture de l'app.";
         });
 }
 
@@ -419,7 +500,7 @@ function renvoyerEnAttente() {
 function envoyerPartieInterrompue() {
     const quizEnCours = coursActuel && document.getElementById("jeu").style.display !== "none"
         && document.getElementById("question") && indexQuestion < questionsAffichees.length;
-    if (!quizEnCours) return;
+    if (!quizEnCours || !prenom) return;
     const nbRepondus = indexQuestion + (peutValider ? 0 : 1);
     if (nbRepondus <= nbRepondusEnvoyes) return; // rien de nouveau depuis le dernier envoi
 
@@ -442,6 +523,11 @@ window.addEventListener('pagehide', envoyerPartieInterrompue);
 
 window.onload = function() {
     renvoyerEnAttente();
+
+    // Illustrations déclarées dans la page (data-illu="Dossier/3D/fichier.png")
+    document.querySelectorAll("img[data-illu]").forEach(img => img.src = illu(img.dataset.illu));
+    majEntete();
+    majInfosNiveaux();
 
     let sauvegarde = JSON.parse(localStorage.getItem('quiz_encours'));
 
@@ -486,7 +572,7 @@ window.onload = function() {
 function afficherNotifReprise() {
     const notif = document.getElementById('notif-reprise');
     if (notif) {
-        notif.innerHTML = `🚀 Ravi de te revoir ${prenom}, on reprend ton entraînement !`;
+        notif.innerText = `Ravi de te revoir ${prenom}, on reprend où tu t'étais arrêté !`;
         notif.style.display = 'block';
         setTimeout(() => { notif.style.display = 'none'; }, 5000);
     }

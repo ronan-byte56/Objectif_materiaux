@@ -1,236 +1,371 @@
+/* ==========================================
+   OBJECTIF MATÉRIAUX — style "cartes pastel"
+   ==========================================
+   Cartes pastel cerclées de noir avec un relief en bas, boutons pilule noirs,
+   illustrations 3D (Fluent Emoji, Microsoft, licence MIT).
+   Polices : Fredoka (titres), Atkinson Hyperlegible (texte, très lisible pour les élèves dys). */
+
+:root {
+    --encre: #17171F;
+    --encre-douce: #5A5B6A;
+    --fond: #EEF3FF;
+    --blanc: #FFFFFF;
+
+    --bleu: #C9DCFF;
+    --jaune: #FFE68F;
+    --vert: #C4F0CF;
+    --rose: #FFD0E6;
+    --violet: #DCD2FF;
+    --peche: #FFD9BF;
+
+    --succes: #157A45;
+    --succes-fond: #D3F5DF;
+    --erreur: #B4232A;
+    --erreur-fond: #FFE1E1;
+    --orange: #FF8A3D;
+
+    --bord: 2px solid var(--encre);
+    --relief: 0 4px 0 var(--encre);
+    --rayon: 22px;
+}
+
+* { box-sizing: border-box; }
+
 body {
-    background: #f4f7f9;
-    color: #333;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
     margin: 0;
+    min-height: 100vh;
+    background: var(--fond);
+    color: var(--encre);
+    font-family: 'Atkinson Hyperlegible', 'Segoe UI', sans-serif;
+    font-size: 17px;
+    line-height: 1.45;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .container {
-    width: 95%;
-    max-width: 650px;
-    text-align: center;
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 16px 16px 40px;
 }
 
-header h1 {
-    color: #2c3e50;
-    border-bottom: 3px solid #3498db;
-    padding-bottom: 15px;
-    margin-bottom: 30px;
+img[data-illu] { object-fit: contain; }
+
+.titre-rond {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 700;
+    line-height: 1.05;
+    margin: 0;
 }
 
-.subtitle {
-    font-size: 1.2em;
-    color: #555;
-    margin-bottom: 25px;
+.titre-section {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: 1.35em;
+    margin: 26px 0 12px;
 }
 
-.btn-group {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+.sous-titre { color: var(--encre-douce); margin: 4px 0 16px; text-align: center; }
+.sous-titre.gauche { text-align: left; margin-top: -4px; }
 
-.btn-lvl {
-    background: #3498db;
-    color: white;
-    border: none;
-    padding: 18px;
-    border-radius: 10px;
-    font-size: 1.3em;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.btn-lvl:hover {
-    background: #2980b9;
-    transform: translateY(-2px);
-}
-
-/* Liste des cours d'un niveau */
-.btn-cours {
+/* ---------- Bandeau du haut ---------- */
+.entete {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    background: white;
-    color: #2c3e50;
-    border: 2px solid #3498db;
-    padding: 16px 18px;
-    border-radius: 10px;
+    margin-bottom: 18px;
+}
+
+.eleve { display: flex; align-items: center; gap: 10px; }
+
+.avatar {
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    border: var(--bord);
+    background: var(--jaune);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
     font-size: 1.1em;
-    text-align: left;
-    cursor: pointer;
-    transition: 0.2s;
 }
 
-.btn-cours:hover {
-    background: #eaf4fc;
-    transform: translateY(-2px);
-}
-
-.btn-cours.ferme {
-    border-style: dashed;
-    border-color: #aaa;
-    color: #888;
-}
-
-.cours-progression {
-    flex-shrink: 0;
-    font-size: 0.85em;
-    font-weight: bold;
-    color: #2ecc71;
-}
-
-.cours-badge {
+.salut { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 1.2em; line-height: 1.1; }
+.role {
     display: inline-block;
-    margin-left: 6px;
-    padding: 2px 8px;
-    border-radius: 10px;
-    background: #e67e22;
-    color: white;
-    font-size: 0.7em;
-    vertical-align: middle;
+    font-size: 0.75em;
+    border: 1.5px solid var(--encre);
+    border-radius: 999px;
+    padding: 0 8px;
+    margin-top: 2px;
 }
 
-.btn-retour {
-    margin-top: 25px;
-    background: none;
-    border: 1px solid #ccc;
-    color: #555;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 1em;
+.pastille {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--jaune);
+    border: var(--bord);
+    border-radius: 999px;
+    padding: 4px 12px 4px 6px;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+}
+.pastille img { width: 26px; height: 26px; }
+.pastille.petite { background: var(--blanc); padding: 2px 10px 2px 4px; font-size: 0.95em; }
+.pastille.petite img { width: 22px; height: 22px; }
+
+/* ---------- Cartes ---------- */
+.carte {
+    display: block;
+    width: 100%;
+    background: var(--blanc);
+    border: var(--bord);
+    border-radius: var(--rayon);
+    box-shadow: var(--relief);
+    padding: 18px;
+    color: var(--encre);
+    font: inherit;
+    text-align: left;
+}
+
+button.carte { cursor: pointer; transition: transform .1s, box-shadow .1s; }
+button.carte:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--encre); }
+
+.fond-bleu { background: var(--bleu); }
+.fond-jaune { background: var(--jaune); }
+.fond-vert { background: var(--vert); }
+.fond-rose { background: var(--rose); }
+.fond-violet { background: var(--violet); }
+.fond-peche { background: var(--peche); }
+
+.liste { display: flex; flex-direction: column; gap: 14px; }
+
+/* Grande carte d'accueil */
+.heros {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 22px 18px;
+}
+.heros h1 { font-size: 2.1em; }
+.heros p { margin: 8px 0 0; color: var(--encre); max-width: 220px; }
+.heros-illu { width: 110px; height: 110px; flex-shrink: 0; transform: rotate(8deg); }
+
+/* Carte en ligne : illustration + texte + flèche */
+.carte-ligne { display: flex; align-items: center; gap: 14px; }
+.carte-ligne .illu {
+    width: 58px; height: 58px; flex-shrink: 0;
+    background: rgba(255,255,255,.65);
+    border: 1.5px solid var(--encre);
+    border-radius: 16px;
+    padding: 6px;
+}
+.carte-texte { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.carte-titre { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 1.2em; line-height: 1.15; }
+.carte-info { font-size: 0.9em; color: var(--encre-douce); }
+.fleche {
+    width: 34px; height: 34px; flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--encre); color: var(--blanc);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4em; line-height: 1; padding-bottom: 3px;
+}
+
+/* Carte de cours : progression + étiquettes */
+.mini-barre {
+    height: 8px;
+    background: rgba(255,255,255,.7);
+    border: 1.5px solid var(--encre);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+.mini-barre div { height: 100%; background: var(--encre); border-radius: 999px; }
+
+.etiquette-cours {
+    align-self: flex-start;
+    font-size: 0.75em;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 1px 9px;
+    border: 1.5px solid var(--encre);
+    background: var(--blanc);
+}
+.etiquette-cours.nouveau { background: var(--orange); color: var(--blanc); border-color: var(--orange); }
+.etiquette-cours.ferme { background: var(--encre); color: var(--blanc); }
+.carte.cours-ferme { opacity: .6; border-style: dashed; }
+
+/* ---------- Boutons ---------- */
+.btn {
+    font: inherit;
     cursor: pointer;
+    border-radius: 999px;
+    transition: transform .1s, box-shadow .1s;
+}
+.btn:active { transform: translateY(2px); }
+
+.btn-noir {
+    background: var(--encre);
+    color: var(--blanc);
+    border: var(--bord);
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: 1.1em;
+    padding: 14px 24px;
+}
+.btn-large { display: block; width: 100%; }
+
+.btn-contour {
+    display: block;
+    margin: 22px auto 0;
+    background: var(--blanc);
+    color: var(--encre);
+    border: var(--bord);
+    box-shadow: 0 3px 0 var(--encre);
+    padding: 10px 22px;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
 }
 
+.btn-rond {
+    width: 44px; height: 44px; flex-shrink: 0;
+    background: var(--blanc);
+    border: var(--bord);
+    box-shadow: 0 3px 0 var(--encre);
+    font-size: 1.6em; line-height: 1;
+    padding: 0 0 4px;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.barre-haut { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.barre-haut .titre-section { margin: 0; }
+
+/* ---------- Quiz ---------- */
 .titre-cours-jeu {
     margin: 0;
-    color: #3498db;
-    font-weight: bold;
-}
-
-.card {
-    background: white;
-    border-radius: 12px;
-    padding: 30px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    margin-top: 20px;
-}
-
-.input-box {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-#input-reponse {
-    flex-grow: 1;
-    padding: 12px;
-    border: 2px solid #ddd;
-    border-radius: 6px;
-    font-size: 1em;
-}
-
-.btn-go {
-    background: #2ecc71;
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-/* Modal / Popup */
-.modal {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background-color: #fefefe;
-    margin: 5% auto; /* Réduit la marge haute pour gagner de la place */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 90%; /* Largeur fluide */
-    max-width: 500px;
-    border-radius: 15px;
-    
-    /* LES LIGNES MAGIQUES CI-DESSOUS */
-    max-height: 85vh; /* Ne dépasse jamais 85% de la hauteur de l'écran */
-    overflow-y: auto; /* Permet de scroller À L'INTÉRIEUR du popup si le texte est trop long */
-    position: relative;
-    -webkit-overflow-scrolling: touch; /* Fluidité du scroll spécifique aux iPhone */
-}
-
-.guide-item {
-    border-left: 4px solid #2ecc71;
-    padding-left: 15px;
-    margin: 15px 0;
-    background: #f9fffb;
-}
-
-.btn-start {
-    background: #3498db;
-    color: white;
-    border: none;
-    padding: 15px;
-    width: 100%;
-    border-radius: 8px;
-    font-size: 1.1em;
-    margin-top: 20px;
-    cursor: pointer;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: 1.05em;
+    line-height: 1.2;
 }
 
 .quiz-stats {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    color: #666;
-    font-weight: bold;
+    display: flex; align-items: center; justify-content: space-between;
+    font-weight: 700;
+    margin-bottom: 8px;
 }
+
+.barre-progression {
+    height: 12px;
+    background: var(--blanc);
+    border: var(--bord);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+#barre-remplie { height: 100%; width: 0; background: var(--orange); transition: width .4s; }
+
+.carte-question { padding: 22px 18px; }
+.theme-question {
+    display: inline-block;
+    margin: 0 0 8px;
+    font-size: 0.78em;
+    font-weight: 700;
+    letter-spacing: .5px;
+    background: var(--violet);
+    border: 1.5px solid var(--encre);
+    border-radius: 999px;
+    padding: 2px 10px;
+}
+#question {
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+    font-size: 1.35em;
+    line-height: 1.35;
+    margin: 0 0 18px;
+}
+
+#input-reponse,
+.input-identite input {
+    width: 100%;
+    font: inherit;
+    font-size: 1.05em;
+    padding: 14px 16px;
+    border: var(--bord);
+    border-radius: 16px;
+    background: var(--fond);
+    color: var(--encre);
+    outline: none;
+}
+#input-reponse { margin-bottom: 12px; }
+#input-reponse:focus, .input-identite input:focus { background: var(--blanc); box-shadow: 0 0 0 4px var(--bleu); }
 
 .feedback {
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 20px;
-    color: white;
-    font-weight: bold;
+    display: flex; align-items: flex-start; gap: 12px;
+    margin-top: 16px;
+    padding: 14px 16px;
+    border: var(--bord);
+    border-radius: var(--rayon);
+    box-shadow: var(--relief);
 }
-.correct { background: #2ecc71; }
-.erreur { background: #e74c3c; }
+.feedback img { width: 40px; height: 40px; flex-shrink: 0; }
+.feedback strong { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 1.15em; display: block; }
+.feedback.correct { background: var(--succes-fond); }
+.feedback.correct strong { color: var(--succes); }
+.feedback.erreur { background: var(--erreur-fond); }
+.feedback.erreur strong { color: var(--erreur); }
 
-/* Petit bandeau de notification de reprise */
-.notif-reprise {
-    background: #3498db;
-    color: white;
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 20px; /* Créé de l'espace sous le bouton Valider */
-    font-weight: bold;
+.notif {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: var(--jaune);
+    border: var(--bord);
+    border-radius: 16px;
+    font-weight: 700;
     text-align: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    font-size: 1.1em;
-    /* On ne met plus de "position: fixed", il va suivre le défilement du clavier */
-}
-@keyframes apparitionNotif {
-    0% { opacity: 0; top: -50px; }
-    15% { opacity: 1; top: 30px; }
-    85% { opacity: 1; top: 30px; }
-    100% { opacity: 0; top: -50px; }
 }
 
+/* ---------- Fin du quiz ---------- */
+.fin-carte { text-align: center; padding: 26px 18px; }
+.fin-carte .fin-illu { width: 120px; height: 120px; }
+.fin-carte h2 { font-size: 1.9em; margin: 6px 0 2px; }
+.fin-score { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 3.2em; line-height: 1; margin: 14px 0 4px; }
+.fin-stats { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 16px 0; }
+.fin-stats .pastille { background: var(--blanc); font-weight: 500; padding: 6px 12px; }
+#statut-envoi { color: var(--encre-douce); font-size: 0.95em; margin: 8px 0 18px; }
 
+/* ---------- Fenêtre d'accueil ---------- */
+.modal {
+    position: fixed; inset: 0;
+    background: rgba(23,23,31,.55);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+}
+.modal-content {
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: var(--blanc);
+    border: var(--bord);
+    border-radius: 26px;
+    box-shadow: 0 6px 0 var(--encre);
+    padding: 22px 20px;
+    text-align: center;
+}
+.modal-illu { width: 72px; height: 72px; }
+.modal-content h2 { font-size: 2em; }
 
+.etiquette { font-weight: 700; text-align: left; margin: 18px 0 8px; }
+.input-identite { display: flex; gap: 10px; }
 
+.conseils { list-style: none; padding: 0; margin: 0 0 20px; text-align: left; display: flex; flex-direction: column; gap: 8px; }
+.conseils li {
+    display: flex; gap: 10px; align-items: flex-start;
+    background: var(--fond);
+    border-radius: 14px;
+    padding: 10px 12px;
+    font-size: 0.95em;
+}
+.conseils li img { width: 30px; height: 30px; flex-shrink: 0; }
+.conseils li.secret { background: var(--jaune); border: 1.5px solid var(--encre); }
 
-
+.case { display: flex; gap: 8px; align-items: center; justify-content: center; margin-top: 14px; font-size: 0.9em; color: var(--encre-douce); }
