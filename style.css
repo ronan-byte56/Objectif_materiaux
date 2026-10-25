@@ -76,7 +76,14 @@ img[data-illu] { object-fit: contain; }
     margin-bottom: 18px;
 }
 
-.eleve { display: flex; align-items: center; gap: 10px; }
+.eleve {
+    display: flex; align-items: center; gap: 10px;
+    background: none; border: none; padding: 0;
+    font: inherit; color: inherit; text-align: left;
+    cursor: pointer;
+}
+.avatar img { width: 100%; height: 100%; border-radius: 50%; }
+.avatar:has(img) { background: var(--bleu); overflow: hidden; }
 
 .avatar {
     width: 46px; height: 46px;
@@ -251,6 +258,73 @@ button.carte:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--encr
     border-radius: 14px;
     padding: 10px 12px;
 }
+
+/* ---------- Inscription : choix de la classe ---------- */
+.choix-classe { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.choix-classe button {
+    font: inherit;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    padding: 12px;
+    border: var(--bord);
+    border-radius: 14px;
+    background: var(--fond);
+    color: var(--encre);
+    cursor: pointer;
+}
+.choix-classe button.choisie { background: var(--encre); color: var(--blanc); }
+
+.carte-podium { margin-top: 14px; }
+
+/* ---------- Écran avatar ---------- */
+.apercu-avatar { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18px; }
+#apercu-avatar { width: 170px; height: 170px; border-radius: 50%; background: var(--blanc); border: var(--bord); }
+.btn-hasard { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; }
+.btn-hasard img { width: 24px; height: 24px; }
+
+.reglages-avatar { margin-top: 14px; padding: 8px 14px; }
+.reglage { padding: 10px 0; border-bottom: 1.5px solid var(--fond); }
+.reglage:last-child { border-bottom: none; }
+.reglage-titre { font-weight: 700; margin-bottom: 8px; display: flex; justify-content: space-between; }
+.reglage-titre span { font-weight: 400; color: var(--encre-douce); }
+.defileur { display: flex; align-items: center; gap: 10px; }
+.defileur .valeur {
+    flex: 1; text-align: center;
+    background: var(--fond); border-radius: 12px; padding: 8px;
+    font-weight: 700;
+}
+.defileur .btn-rond { width: 40px; height: 40px; font-size: 1.4em; }
+.pastilles-couleur { display: flex; flex-wrap: wrap; gap: 8px; }
+.pastilles-couleur button {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: 1.5px solid var(--encre);
+    cursor: pointer;
+}
+.pastilles-couleur button.choisie { box-shadow: 0 0 0 3px var(--blanc), 0 0 0 5px var(--encre); }
+
+/* ---------- Écran classement : podium ---------- */
+.podium-carte { padding: 18px 12px 0; overflow: hidden; }
+.podium { display: flex; align-items: flex-end; justify-content: center; gap: 8px; min-height: 260px; }
+.marche { flex: 1; max-width: 140px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.marche .tete { width: 74px; height: 74px; border-radius: 50%; background: var(--blanc); border: var(--bord); }
+.marche.premier .tete { width: 92px; height: 92px; }
+.marche .nom-podium { font-family: 'Fredoka', sans-serif; font-weight: 600; margin-top: 6px; line-height: 1.1; }
+.marche .score-podium { display: inline-flex; align-items: center; gap: 4px; font-size: .9em; font-weight: 700; margin: 4px 0 8px; }
+.marche .score-podium img { width: 18px; height: 18px; }
+.marche .socle {
+    width: 100%;
+    border: var(--bord); border-bottom: none;
+    border-radius: 14px 14px 0 0;
+    display: flex; justify-content: center; padding-top: 8px;
+}
+.marche .socle img { width: 40px; height: 40px; }
+.marche.premier .socle { height: 120px; background: var(--jaune); }
+.marche.deuxieme .socle { height: 90px; background: var(--vert); }
+.marche.troisieme .socle { height: 64px; background: var(--rose); }
+.marche.vide .tete { background: rgba(255,255,255,.5); border-style: dashed; }
+.encouragement { margin-top: 16px; text-align: center; }
+.encouragement strong { font-family: 'Fredoka', sans-serif; font-size: 1.2em; display: block; margin-bottom: 4px; }
 
 /* ---------- Boutons ---------- */
 .btn {

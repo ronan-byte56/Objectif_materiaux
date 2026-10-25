@@ -17,6 +17,12 @@ let minuterieSuite = null; // passage automatique à la question suivante après
 // Récupération de l'identité
 let prenom = localStorage.getItem('user_prenom') || "";
 let nom = localStorage.getItem('user_nom') || "";
+let classe = localStorage.getItem('user_classe') || ""; // 2COMPO, 1COMPO, TCOMPO ou Invité
+let avatar = JSON.parse(localStorage.getItem('user_avatar')) || null;
+
+// Diamants : questions réussies au moins une fois. Contrairement à questionsReussies
+// (remis à zéro quand un cours est terminé pour pouvoir le refaire), un diamant reste acquis.
+let diamantsAcquis = JSON.parse(localStorage.getItem('diamants_acquis')) || [...questionsReussies];
 
 // Aperçu prof : adresse terminée par ?prof -> les cours fermés sont visibles aussi
 const modeProf = new URLSearchParams(location.search).has('prof');
@@ -118,17 +124,24 @@ function contientDansLOrdre(motsEleve, motsCle, k, dernier) {
 function validerEtFermer() {
     const p = document.getElementById("user-prenom").value.trim();
     const n = document.getElementById("user-nom").value.trim();
+    const choisie = document.querySelector("#choix-classe button.choisie");
 
     if (p === "" || n === "") {
         alert("Pense à remplir ton nom et ton prénom pour que je puisse te reconnaître !");
+        return;
+    }
+    if (!choisie) {
+        alert("Choisis ta classe (ou Invité) pour apparaître sur le bon podium !");
         return;
     }
 
     // Sauvegarde
     localStorage.setItem('user_prenom', p);
     localStorage.setItem('user_nom', n);
+    localStorage.setItem('user_classe', choisie.dataset.classe);
     prenom = p;
     nom = n;
+    classe = choisie.dataset.classe;
 
     // Gestion du "Ne plus afficher"
     if (document.getElementById('nePlusAfficher').checked) {
@@ -137,6 +150,13 @@ function validerEtFermer() {
 
     document.getElementById('welcome-modal').style.display = "none";
     majEntete();
+    envoyerProfil();
+
+    // Pas encore d'avatar : on propose de le créer tout de suite
+    if (!avatar && document.getElementById('jeu').style.display === 'none') {
+        ouvrirAvatar();
+        return;
+    }
 
     // Si une partie est en cours, on affiche la notif personnalisée
     if (localStorage.getItem('quiz_encours')) {
@@ -166,11 +186,20 @@ function estNouveau(cours) {
     return jours < JOURS_NOUVEAU;
 }
 
-// Bandeau du haut : initiales, "Salut Prénom", diamants = questions réussies
+// Bandeau du haut : avatar (ou initiales), "Salut Prénom", classe, diamants
 function majEntete() {
-    document.getElementById("avatar").innerText = ((prenom[0] || "") + (nom[0] || "")).toUpperCase() || "?";
+    const pastille = document.getElementById("avatar");
+    if (avatar) {
+        const image = element("img");
+        image.src = urlAvatar(avatar);
+        image.alt = "";
+        pastille.replaceChildren(image);
+    } else {
+        pastille.innerText = ((prenom[0] || "") + (nom[0] || "")).toUpperCase() || "?";
+    }
     document.getElementById("salut").innerText = prenom ? `Salut ${prenom} !` : "Salut !";
-    document.getElementById("total-diamants").innerText = questionsReussies.length;
+    document.getElementById("role").innerText = classe || "Élève";
+    document.getElementById("total-diamants").innerText = diamantsAcquis.length;
 }
 
 // Écran 1 : nombre de cours ouverts sous chaque niveau
@@ -181,7 +210,7 @@ function majInfosNiveaux() {
 }
 
 function afficherEcran(id) {
-    ["selection-niveau", "selection-cours", "jeu", "fin", "revision"].forEach(e =>
+    ["selection-niveau", "selection-cours", "jeu", "fin", "revision", "ecran-avatar", "classement"].forEach(e =>
         document.getElementById(e).style.display = (e === id ? "block" : "none"));
     document.body.classList.toggle("en-jeu", id === "jeu");
     window.scrollTo(0, 0);
@@ -439,6 +468,10 @@ function verifierReponse() {
             questionsReussies.push(q.q);
             localStorage.setItem('quiz_reussies', JSON.stringify(questionsReussies));
         }
+        if (!diamantsAcquis.includes(q.q)) {
+            diamantsAcquis.push(q.q);
+            localStorage.setItem('diamants_acquis', JSON.stringify(diamantsAcquis));
+        }
         majEntete();
     }
     const image = element("img");
@@ -532,13 +565,32 @@ function continuerCours() {
 function donneesResultats(statut) {
     // Le cours et l'état apparaissent dans la colonne "niveau" du Google Sheet
     return {
-        nom_complet: prenom + " " + nom.toUpperCase(),
+        ...donneesProfil(),
+        nom_complet: prenom + " " + nom.toUpperCase() + (classe ? ` (${classe})` : ""),
         niveau: niveauActuel + " – " + coursActuel.titre + " (" + statut + ")",
         cours: coursActuel.titre,
         statut: statut,
         score: score, // On envoie juste le nombre (ex: 16)
         temps: timerGlobal // On envoie les secondes totales (ex: 501)
     };
+}
+
+// Profil pour le classement : le programme Google garde le plus grand nombre de diamants reçu
+function donneesProfil() {
+    return {
+        prenom: prenom,
+        nom: nom,
+        classe: classe,
+        diamants: diamantsAcquis.length,
+        avatar: avatar ? JSON.stringify(avatar) : ""
+    };
+}
+
+function envoyerProfil() {
+    if (!prenom || !classe) return Promise.resolve();
+    const donnees = { type: "profil", ...donneesProfil() };
+    return fetch(URL_SCRIPT, { method: "POST", mode: "no-cors", body: JSON.stringify(donnees) })
+        .catch(() => mettreEnAttente(donnees));
 }
 
 function envoyerResultats(donnees) {
@@ -589,6 +641,200 @@ document.addEventListener('visibilitychange', () => {
 window.addEventListener('pagehide', envoyerPartieInterrompue);
 
 // ==========================================
+// AVATAR (DiceBear, style "Avataaars" de Pablo Stanley : libre d'usage)
+// ==========================================
+// L'avatar est un petit objet de réglages ; l'image est fabriquée par l'API DiceBear.
+
+const COULEURS_ACCESSOIRES = ["262e33", "65c9ff", "5199e4", "25557c", "e6e6e6", "929598", "3c4f5c", "b1e2ff", "a7ffc4", "ffafb9", "ffffb1", "ff488e", "ff5c5c", "ffffff"];
+const REGLAGES_AVATAR = [
+    { cle: "skinColor", titre: "Peau", couleurs: ["ffdbb4", "edb98a", "fd9841", "d08b5b", "ae5d29", "614335", "f8d25c"] },
+    { cle: "top", titre: "Coiffure", valeurs: ["shortFlat", "shortRound", "shortWaved", "shortCurly", "theCaesar", "theCaesarAndSidePart", "sides", "dreads01", "dreads02", "frizzle", "shaggy", "shaggyMullet", "bigHair", "bob", "bun", "curly", "curvy", "dreads", "frida", "fro", "froBand", "longButNotTooLong", "miaWallace", "shavedSides", "straight01", "straight02", "straightAndStrand", "hat", "hijab", "turban", "winterHat1", "winterHat02", "winterHat03", "winterHat04"] },
+    { cle: "hairColor", titre: "Cheveux et barbe", couleurs: ["2c1b18", "4a312c", "724133", "a55728", "b58143", "d6b370", "ecdcbf", "e8e1e1", "c93305", "f59797"] },
+    { cle: "eyes", titre: "Yeux", valeurs: ["default", "happy", "wink", "squint", "side", "surprised", "hearts", "eyeRoll", "winkWacky", "closed"] },
+    { cle: "eyebrows", titre: "Sourcils", valeurs: ["defaultNatural", "raisedExcitedNatural", "flatNatural", "upDownNatural", "angryNatural", "sadConcernedNatural", "unibrowNatural", "default", "raisedExcited", "angry"] },
+    { cle: "mouth", titre: "Bouche", valeurs: ["smile", "default", "twinkle", "tongue", "serious", "eating", "disbelief", "concerned"] },
+    { cle: "accessories", titre: "Lunettes", valeurs: ["aucune", "prescription01", "prescription02", "round", "kurt", "wayfarers", "sunglasses"] },
+    { cle: "facialHair", titre: "Barbe", valeurs: ["aucune", "beardLight", "beardMedium", "beardMajestic", "moustacheFancy", "moustacheMagnum"] },
+    { cle: "clothing", titre: "Vêtement", valeurs: ["hoodie", "shirtCrewNeck", "shirtVNeck", "shirtScoopNeck", "graphicShirt", "collarAndSweater", "blazerAndShirt", "blazerAndSweater", "overall"] },
+    { cle: "clothesColor", titre: "Couleur du vêtement", couleurs: COULEURS_ACCESSOIRES },
+    { cle: "fond", titre: "Fond", couleurs: ["c9dcff", "ffe68f", "c4f0cf", "ffd0e6", "dcd2ff", "ffd9bf"] }
+];
+let avatarEnCours = null;
+
+function urlAvatar(a) {
+    const p = new URLSearchParams({
+        seed: "objectif-materiaux",
+        top: a.top, topProbability: 100,
+        hairColor: a.hairColor, facialHairColor: a.hairColor,
+        skinColor: a.skinColor,
+        eyes: a.eyes, eyebrows: a.eyebrows, mouth: a.mouth,
+        clothing: a.clothing, clothesColor: a.clothesColor, clothingGraphic: "diamond",
+        accessoriesProbability: a.accessories === "aucune" ? 0 : 100,
+        facialHairProbability: a.facialHair === "aucune" ? 0 : 100,
+        backgroundColor: a.fond
+    });
+    if (a.accessories !== "aucune") p.set("accessories", a.accessories);
+    if (a.facialHair !== "aucune") p.set("facialHair", a.facialHair);
+    return "https://api.dicebear.com/9.x/avataaars/svg?" + p.toString();
+}
+
+function avatarAleatoire() {
+    const hasard = liste => liste[Math.floor(Math.random() * liste.length)];
+    const a = {};
+    REGLAGES_AVATAR.forEach(r => a[r.cle] = hasard(r.valeurs || r.couleurs));
+    a.accessories = Math.random() < 0.7 ? "aucune" : a.accessories; // pas trop de lunettes
+    a.facialHair = Math.random() < 0.8 ? "aucune" : a.facialHair;  // pas trop de barbes
+    return a;
+}
+
+let ecranAvantAvatar = "selection-niveau";
+function ouvrirAvatar() {
+    const visible = ["selection-niveau", "selection-cours", "revision", "classement"].find(e => document.getElementById(e).style.display !== "none");
+    if (document.getElementById("jeu").style.display !== "none") return; // pas pendant un quiz
+    ecranAvantAvatar = visible || "selection-niveau";
+    avatarEnCours = avatar ? { ...avatar } : avatarAleatoire();
+    dessinerReglagesAvatar();
+    afficherEcran("ecran-avatar");
+}
+
+function fermerAvatar() {
+    if (ecranAvantAvatar === "selection-cours") choisirNiveau(niveauActuel);
+    else if (ecranAvantAvatar === "classement") ouvrirClassement();
+    else retourNiveaux();
+}
+
+function avatarAuHasard() {
+    avatarEnCours = avatarAleatoire();
+    dessinerReglagesAvatar();
+}
+
+function enregistrerAvatar() {
+    avatar = { ...avatarEnCours };
+    localStorage.setItem('user_avatar', JSON.stringify(avatar));
+    majEntete();
+    envoyerProfil();
+    fermerAvatar();
+}
+
+function dessinerReglagesAvatar() {
+    document.getElementById("apercu-avatar").src = urlAvatar(avatarEnCours);
+    document.getElementById("fond-apercu").style.background = "#" + avatarEnCours.fond;
+    const zone = document.getElementById("reglages-avatar");
+    zone.innerHTML = "";
+    REGLAGES_AVATAR.forEach(r => {
+        const bloc = element("div", "reglage");
+        const titre = element("div", "reglage-titre", r.titre);
+        bloc.append(titre);
+        if (r.valeurs) {
+            // Flèches : modèle précédent / suivant
+            const i = Math.max(0, r.valeurs.indexOf(avatarEnCours[r.cle]));
+            const aucun = r.valeurs[i] === "aucune";
+            const defileur = element("div", "defileur");
+            const avant = element("button", "btn btn-rond", "‹");
+            const apres = element("button", "btn btn-rond", "›");
+            const changer = pas => {
+                avatarEnCours[r.cle] = r.valeurs[(i + pas + r.valeurs.length) % r.valeurs.length];
+                dessinerReglagesAvatar();
+            };
+            avant.onclick = () => changer(-1);
+            apres.onclick = () => changer(1);
+            const numero = r.valeurs[0] === "aucune" ? i : i + 1;
+            const total = r.valeurs[0] === "aucune" ? r.valeurs.length - 1 : r.valeurs.length;
+            defileur.append(avant, element("span", "valeur", aucun ? "Aucune" : `Modèle ${numero} sur ${total}`), apres);
+            bloc.append(defileur);
+        } else {
+            // Pastilles de couleur
+            const pastilles = element("div", "pastilles-couleur");
+            r.couleurs.forEach(c => {
+                const b = element("button", c === avatarEnCours[r.cle] ? "choisie" : "");
+                b.style.background = "#" + c;
+                b.setAttribute("aria-label", r.titre + " " + c);
+                b.onclick = () => { avatarEnCours[r.cle] = c; dessinerReglagesAvatar(); };
+                pastilles.append(b);
+            });
+            bloc.append(pastilles);
+        }
+        zone.append(bloc);
+    });
+}
+
+// ==========================================
+// CLASSEMENT : podium des 3 premiers de la classe
+// ==========================================
+// Seuls les 3 premiers sont affichés (choix du prof : personne ne doit se sentir rabaissé).
+// Les données viennent du Google Sheet (onglet "Classement") via le programme Google.
+
+async function ouvrirClassement() {
+    afficherEcran("classement");
+    const podium = document.getElementById("podium");
+    const encouragement = document.getElementById("encouragement");
+    document.getElementById("titre-classement").innerText = classe ? `Podium ${classe}` : "Podium";
+    document.getElementById("annee-classement").innerText = "";
+    podium.replaceChildren(element("p", "", "Chargement du podium…"));
+    encouragement.replaceChildren();
+
+    if (!classe) {
+        podium.replaceChildren(element("p", "", "Choisis ta classe pour voir ton podium."));
+        return;
+    }
+    try {
+        await envoyerProfil(); // tes derniers diamants comptent tout de suite
+        const reponse = await fetch(`${URL_SCRIPT}?action=podium&classe=${encodeURIComponent(classe)}&prenom=${encodeURIComponent(prenom)}&nom=${encodeURIComponent(nom)}`);
+        const donnees = await reponse.json();
+        document.getElementById("annee-classement").innerText = `Année ${donnees.annee} · les 3 élèves qui ont le plus de diamants`;
+        dessinerPodium(donnees.podium || []);
+    } catch (e) {
+        podium.replaceChildren(element("p", "", "Pas de connexion : le podium n'a pas pu se charger."));
+    }
+}
+
+function dessinerPodium(liste) {
+    const places = [
+        { rang: 1, classeCss: "premier", medaille: "1st place medal/3D/1st_place_medal_3d.png" },
+        { rang: 2, classeCss: "deuxieme", medaille: "2nd place medal/3D/2nd_place_medal_3d.png" },
+        { rang: 3, classeCss: "troisieme", medaille: "3rd place medal/3D/3rd_place_medal_3d.png" }
+    ];
+    const ordreAffichage = [places[1], places[0], places[2]]; // 2e, 1er, 3e
+    const podium = document.getElementById("podium");
+    podium.replaceChildren();
+    ordreAffichage.forEach(place => {
+        const eleve = liste[place.rang - 1];
+        const marche = element("div", `marche ${place.classeCss}${eleve ? "" : " vide"}`);
+        const tete = element("img", "tete");
+        tete.alt = "";
+        if (eleve && eleve.avatar) tete.src = urlAvatar(eleve.avatar);
+        marche.append(tete);
+        marche.append(element("div", "nom-podium", eleve ? eleve.nom : "Place libre"));
+        const score = element("div", "score-podium");
+        if (eleve) {
+            const gemme = element("img");
+            gemme.src = illu("Gem stone/3D/gem_stone_3d.png");
+            gemme.alt = "";
+            score.append(gemme, document.createTextNode(String(eleve.diamants)));
+        }
+        marche.append(score);
+        const socle = element("div", "socle");
+        const medaille = element("img");
+        medaille.src = illu(place.medaille);
+        medaille.alt = place.rang + "e place";
+        socle.append(medaille);
+        marche.append(socle);
+        podium.append(marche);
+    });
+
+    // Encouragement : jamais de numéro de place en dehors du podium
+    const surPodium = liste.some(e => e.moi);
+    const n = diamantsAcquis.length;
+    const encouragement = document.getElementById("encouragement");
+    encouragement.replaceChildren(
+        element("strong", "", surPodium ? "Bravo, tu es sur le podium !" : "Continue comme ça !"),
+        element("span", "", surPodium
+            ? "Garde ta place : chaque nouvelle question réussie te rapporte un diamant."
+            : `Tu as ${n} diamant${n > 1 ? "s" : ""}. Chaque nouvelle question réussie t'en rapporte un de plus.`)
+    );
+}
+
+// ==========================================
 // 4. INITIALISATION
 // ==========================================
 
@@ -608,13 +854,26 @@ window.onload = function() {
         localStorage.setItem('quiz_encours', JSON.stringify(sauvegarde));
     }
 
+    // Diamants : on enregistre la liste dès le premier lancement de cette version
+    localStorage.setItem('diamants_acquis', JSON.stringify(diamantsAcquis));
+
+    // Choix de la classe dans la fenêtre d'accueil
+    document.querySelectorAll("#choix-classe button").forEach(b => {
+        if (b.dataset.classe === classe) b.classList.add("choisie");
+        b.onclick = () => {
+            document.querySelectorAll("#choix-classe button").forEach(x => x.classList.remove("choisie"));
+            b.classList.add("choisie");
+        };
+    });
+
     // Remplissage automatique si déjà connu
     if (prenom) {
         document.getElementById('user-prenom').value = prenom;
         document.getElementById('user-nom').value = nom;
-        // On cache la section si l'élève est déjà connu
-        document.getElementById('section-identification').style.display = "none";
+        // On cache la section si l'élève est déjà connu (et a déjà choisi sa classe)
+        if (classe) document.getElementById('section-identification').style.display = "none";
     }
+    envoyerProfil();
 
     // Reprise de la partie en cours (si le cours existe toujours et est ouvert)
     if (sauvegarde && sauvegarde.niveau) {
@@ -633,7 +892,8 @@ window.onload = function() {
         }
     }
 
-    if (!localStorage.getItem('guide_vu')) {
+    // Fenêtre d'accueil : au premier lancement, ou pour un élève déjà inscrit qui n'a pas encore de classe
+    if (!localStorage.getItem('guide_vu') || (prenom && !classe)) {
         document.getElementById('welcome-modal').style.display = "flex";
     } else {
         if (sauvegarde) { afficherNotifReprise(); }

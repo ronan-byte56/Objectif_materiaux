@@ -30,6 +30,13 @@
                     <input type="text" id="user-prenom" placeholder="Prénom" autocomplete="given-name">
                     <input type="text" id="user-nom" placeholder="Nom" autocomplete="family-name">
                 </div>
+                <p class="etiquette">Ta classe</p>
+                <div class="choix-classe" id="choix-classe">
+                    <button type="button" data-classe="2COMPO">2COMPO</button>
+                    <button type="button" data-classe="1COMPO">1COMPO</button>
+                    <button type="button" data-classe="TCOMPO">TCOMPO</button>
+                    <button type="button" data-classe="Invité">Invité</button>
+                </div>
             </div>
 
             <p class="etiquette">Pour obtenir ton 20/20, suis ces conseils</p>
@@ -51,13 +58,13 @@
 
         <!-- Bandeau du haut : élève + diamants (questions réussies) -->
         <header class="entete">
-            <div class="eleve">
+            <button class="eleve" onclick="ouvrirAvatar()" aria-label="Modifier mon avatar">
                 <div class="avatar" id="avatar"></div>
                 <div>
                     <div class="salut" id="salut">Salut !</div>
-                    <div class="role">Élève</div>
+                    <div class="role" id="role">Élève</div>
                 </div>
-            </div>
+            </button>
             <div class="pastille" title="Questions réussies">
                 <img data-illu="Gem stone/3D/gem_stone_3d.png" alt="">
                 <span id="total-diamants">0</span>
@@ -73,6 +80,12 @@
                 </div>
                 <img class="heros-illu" data-illu="Trophy/3D/trophy_3d.png" alt="">
             </div>
+
+            <button class="carte carte-ligne fond-violet carte-podium" onclick="ouvrirClassement()">
+                <img class="illu" data-illu="1st place medal/3D/1st_place_medal_3d.png" alt="">
+                <span class="carte-texte"><span class="carte-titre">Le podium de ta classe</span><span class="carte-info" id="info-podium">Qui a le plus de diamants&nbsp;?</span></span>
+                <span class="fleche">›</span>
+            </button>
 
             <h2 class="titre-section">Choisis ton niveau</h2>
             <div class="liste">
@@ -141,6 +154,33 @@
             <button class="btn btn-contour btn-tout" id="btn-tout-voir" onclick="basculerToutesReponses()">Afficher toutes les réponses</button>
             <div class="liste" id="liste-revision"></div>
             <button class="btn btn-noir btn-large btn-bas" id="btn-jouer-revision">Jouer ce cours</button>
+        </section>
+
+        <!-- Écran avatar : l'élève crée son personnage -->
+        <section id="ecran-avatar" style="display:none;">
+            <div class="barre-haut">
+                <button class="btn btn-rond" onclick="fermerAvatar()" aria-label="Retour">‹</button>
+                <h2 class="titre-section">Mon avatar</h2>
+            </div>
+            <div class="carte apercu-avatar fond-bleu" id="fond-apercu">
+                <img id="apercu-avatar" alt="Ton avatar">
+                <button class="btn btn-blanc btn-hasard" onclick="avatarAuHasard()"><img data-illu="Game die/3D/game_die_3d.png" alt="">Au hasard</button>
+            </div>
+            <div class="carte reglages-avatar" id="reglages-avatar"></div>
+            <button class="btn btn-noir btn-large btn-bas" onclick="enregistrerAvatar()">Enregistrer mon avatar</button>
+        </section>
+
+        <!-- Écran classement : podium des 3 premiers de la classe (personne d'autre n'est affiché) -->
+        <section id="classement" style="display:none;">
+            <div class="barre-haut">
+                <button class="btn btn-rond" onclick="retourNiveaux()" aria-label="Retour">‹</button>
+                <h2 class="titre-section" id="titre-classement">Podium</h2>
+            </div>
+            <p class="sous-titre gauche" id="annee-classement"></p>
+            <div class="carte podium-carte fond-violet">
+                <div class="podium" id="podium"></div>
+            </div>
+            <div class="carte encouragement" id="encouragement"></div>
         </section>
 
         <!-- Écran 4 : fin du quiz -->
