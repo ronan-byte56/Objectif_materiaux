@@ -50,6 +50,69 @@ header h1 {
     transform: translateY(-2px);
 }
 
+/* Liste des cours d'un niveau */
+.btn-cours {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: white;
+    color: #2c3e50;
+    border: 2px solid #3498db;
+    padding: 16px 18px;
+    border-radius: 10px;
+    font-size: 1.1em;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-cours:hover {
+    background: #eaf4fc;
+    transform: translateY(-2px);
+}
+
+.btn-cours.ferme {
+    border-style: dashed;
+    border-color: #aaa;
+    color: #888;
+}
+
+.cours-progression {
+    flex-shrink: 0;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: #2ecc71;
+}
+
+.cours-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: #e67e22;
+    color: white;
+    font-size: 0.7em;
+    vertical-align: middle;
+}
+
+.btn-retour {
+    margin-top: 25px;
+    background: none;
+    border: 1px solid #ccc;
+    color: #555;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.titre-cours-jeu {
+    margin: 0;
+    color: #3498db;
+    font-weight: bold;
+}
+
 .card {
     background: white;
     border-radius: 12px;

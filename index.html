@@ -84,11 +84,18 @@
             </div>
         </div>
 
+        <div id="selection-cours" style="display:none;">
+            <p class="subtitle" id="titre-niveau">Choisis ton cours :</p>
+            <div class="btn-group" id="liste-cours"></div>
+            <button class="btn-retour" onclick="retourNiveaux()">← Changer de niveau</button>
+        </div>
+
         <div id="jeu" style="display:none;">
             <div class="quiz-stats">
                 <span id="timer">Temps : 0m 00s</span>
                 <span id="progression">Question 1 / 20</span>
             </div>
+            <p id="titre-cours-jeu" class="titre-cours-jeu"></p>
             
             <div class="card">
                 <h2 id="question">Chargement...</h2>
@@ -102,6 +109,7 @@
         </div>
     </div>
 
+    <script src="questions.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
