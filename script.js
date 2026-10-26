@@ -593,8 +593,22 @@ function donneesProfil() {
         nom: nom,
         classe: classe,
         diamants: diamantsAcquis.length,
-        avatar: avatar ? JSON.stringify(avatar) : ""
+        avatar: avatar ? JSON.stringify(avatar) : "",
+        cle: cleAppareil()
     };
+}
+
+// Clé secrète de l'appareil (invisible pour l'élève) : créée une fois, puis envoyée avec le profil.
+// Le programme Google la garde ; un autre téléphone ne peut alors plus modifier ce profil.
+function cleAppareil() {
+    let cle = localStorage.getItem('cle_appareil');
+    if (!/^[a-f0-9]{32}$/.test(cle || "")) {
+        const octets = new Uint8Array(16);
+        crypto.getRandomValues(octets);
+        cle = Array.from(octets, o => o.toString(16).padStart(2, "0")).join("");
+        localStorage.setItem('cle_appareil', cle);
+    }
+    return cle;
 }
 
 function envoyerProfil() {
