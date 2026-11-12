@@ -9,9 +9,6 @@
     <meta name="theme-color" content="#EEF3FF">
     <link rel="apple-touch-icon" href="logo.png">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -52,6 +49,44 @@
 
             <button class="btn btn-noir btn-large" onclick="validerEtFermer()">C'est parti</button>
             <label class="case"><input type="checkbox" id="nePlusAfficher"> Ne plus afficher ce guide au démarrage</label>
+            <button type="button" class="lien-mentions" onclick="ouvrirMentions()">Mentions légales et confidentialité</button>
+        </div>
+    </div>
+
+    <!-- Mentions légales et confidentialité (ouvertes depuis l'accueil, l'écran des niveaux ou le profil) -->
+    <div id="modal-mentions" class="modal" onclick="if (event.target === this) fermerMentions()">
+        <div class="modal-content mentions">
+            <h2 class="titre-rond">Mentions légales et confidentialité</h2>
+
+            <h3>Qui publie cette app&nbsp;?</h3>
+            <p>Objectif Matériaux est réalisée par Ronan Le Bail, professeur de Plastiques et Composites au lycée Jean Macé de Lanester, pour ses élèves. Il en est le directeur de la publication.</p>
+
+            <h3>Hébergement</h3>
+            <p>GitHub Pages, service de GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.</p>
+
+            <h3>Ce qui est enregistré</h3>
+            <p>Ton prénom, ton nom, ta classe, ton avatar dessiné (jamais de photo) et les résultats de tes quiz&nbsp;: le cours, la note sur 20, la durée, la date et le nombre de questions réussies. Un code tiré au hasard par ton téléphone est aussi envoyé&nbsp;: il empêche quelqu'un d'autre de modifier ton profil.</p>
+
+            <h3>Pourquoi</h3>
+            <p>Pour que ton professeur suive tes révisions, dans le cadre de l'enseignement au lycée, et pour afficher le podium des 3 premiers de ta classe (prénom et initiale du nom). Les autres élèves ne voient jamais ton classement si tu n'es pas sur le podium.</p>
+
+            <h3>Qui les voit et où elles sont</h3>
+            <p>Seulement ton professeur. Les résultats sont rangés dans un tableur Google (Google LLC) dont il est le seul à avoir l'accès. Google et GitHub sont des sociétés américaines&nbsp;: les données peuvent être stockées hors de l'Union européenne, dans le cadre de l'accord entre l'Union européenne et les États-Unis sur la protection des données.</p>
+
+            <h3>Combien de temps</h3>
+            <p>Jusqu'à la fin de l'année scolaire. Elles sont ensuite effacées.</p>
+
+            <h3>Sur ton téléphone</h3>
+            <p>Ta progression et ton profil restent dans la mémoire du navigateur, seulement pour le jeu. Il n'y a ni publicité, ni outil de statistiques, ni pistage. Les polices, les illustrations et les avatars font partie de l'app&nbsp;: aucun autre site n'est contacté, à part l'hébergeur (GitHub) et le tableur de ton professeur (Google).</p>
+
+            <h3>Crédits</h3>
+            <p>Polices Fredoka et Atkinson Hyperlegible (licence SIL Open Font License). Illustrations Fluent Emoji de Microsoft (licence MIT). Avatars dessinés avec DiceBear (licence MIT), d'après Avataaars de Pablo Stanley.</p>
+
+            <h3>Tes droits</h3>
+            <p>Tu peux demander à voir, corriger ou effacer tes données, ou refuser qu'elles soient utilisées&nbsp;: parles-en à ton professeur, ou demande au lycée de transmettre ta demande à son délégué à la protection des données. Si tu penses que tes droits ne sont pas respectés, tu peux t'adresser à la CNIL (cnil.fr).</p>
+
+            <p class="maj">Mise à jour&nbsp;: 12 novembre 2026</p>
+            <button class="btn btn-noir btn-large" onclick="fermerMentions()">Fermer</button>
         </div>
     </div>
 
@@ -106,6 +141,7 @@
                     <span class="fleche">›</span>
                 </button>
             </div>
+            <button type="button" class="lien-mentions" onclick="ouvrirMentions()">Mentions légales et confidentialité</button>
         </section>
 
         <!-- Écran 2 : les cours du niveau -->
@@ -181,6 +217,7 @@
             </div>
             <div class="carte reglages-avatar" id="reglages-avatar"></div>
             <button class="btn btn-noir btn-large btn-bas" onclick="enregistrerAvatar()">Enregistrer mon profil</button>
+            <button type="button" class="lien-mentions" onclick="ouvrirMentions()">Mentions légales et confidentialité</button>
         </section>
 
         <!-- Écran classement : podium des 3 premiers de la classe (personne d'autre n'est affiché) -->
@@ -201,6 +238,7 @@
     </div>
 
     <script src="questions.js"></script>
+    <script src="avatars.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

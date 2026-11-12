@@ -1,12 +1,28 @@
-const CACHE_NAME = 'objectif-materiaux-v2';
+const CACHE_NAME = 'objectif-materiaux-v3';
+// Polices, illustrations et avatars sont dans l'app : tout marche hors ligne dès la 1re visite
+const ILLUS = ['test_tube_3d', 'yarn_3d', 'scroll_3d', 'safety_vest_3d', 'gear_3d', 'books_3d',
+  'hammer_and_wrench_3d', 'check_mark_button_3d', 'cross_mark_3d', 'trophy_3d', 'glowing_star_3d',
+  'gem_stone_3d', 'hourglass_not_done_3d', '1st_place_medal_3d', '2nd_place_medal_3d', '3rd_place_medal_3d',
+  'waving_hand_3d_default', 'bullseye_3d', 'pencil_3d', 'card_index_dividers_3d', 'light_bulb_3d',
+  'rocket_3d', 'mobile_phone_3d', 'fire_3d', 'graduation_cap_3d', 'game_die_3d'];
 const ASSETS = [
   './',
   './index.html',
   './questions.js',
+  './avatars.js',
   './script.js',
   './style.css',
   './manifest.json',
-  './logo.png'
+  './logo.png',
+  './polices/fredoka.woff2',
+  './polices/fredoka-ext.woff2',
+  './polices/atkinson-400.woff2',
+  './polices/atkinson-400-ext.woff2',
+  './polices/atkinson-700.woff2',
+  './polices/atkinson-700-ext.woff2',
+  './polices/atkinson-400-italique.woff2',
+  './polices/atkinson-400-italique-ext.woff2',
+  ...ILLUS.map((nom) => './illus/' + nom + '.png')
 ];
 
 // Installation du Service Worker

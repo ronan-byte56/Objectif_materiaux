@@ -41,9 +41,11 @@ const modeProf = new URLSearchParams(location.search).has('prof');
 const NOMS_NIVEAUX = { seconde: "Seconde", premiere: "Première", terminale: "Terminale" };
 const JOURS_NOUVEAU = 14; // un cours ouvert depuis moins de 14 jours porte le badge "Nouveau"
 
-// Illustrations 3D : Fluent Emoji de Microsoft (licence MIT), version figée
-const URL_ILLUS = "https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@1ffb34c752ecf5d402f04cfb4b392c77f57c54bc/assets/";
-function illu(chemin) { return URL_ILLUS + chemin.split("/").map(encodeURIComponent).join("/"); }
+// Illustrations 3D : Fluent Emoji de Microsoft (licence MIT, commit 1ffb34c), copiées dans le dossier illus/.
+// On garde le chemin d'origine ("Dossier/3D/fichier.png") ; seul le nom du fichier sert.
+// Une nouvelle illustration doit d'abord être ajoutée dans illus/.
+const URL_ILLUS = "illus/";
+function illu(chemin) { return URL_ILLUS + chemin.split("/").pop(); }
 
 // Illustration d'un cours : champ "icone" du cours, sinon d'après les mots du titre
 const ILLUS_COURS = [
@@ -225,6 +227,17 @@ function afficherEcran(id) {
         document.getElementById(e).style.display = (e === id ? "block" : "none"));
     document.body.classList.toggle("en-jeu", id === "jeu");
     window.scrollTo(0, 0);
+}
+
+// Mentions légales et confidentialité : fenêtre par-dessus l'écran en cours (ou par-dessus l'accueil)
+function ouvrirMentions() {
+    const fenetre = document.getElementById("modal-mentions");
+    fenetre.style.display = "flex";
+    fenetre.querySelector(".modal-content").scrollTop = 0;
+}
+
+function fermerMentions() {
+    document.getElementById("modal-mentions").style.display = "none";
 }
 
 function element(balise, classe, texte) {
@@ -668,7 +681,8 @@ window.addEventListener('pagehide', envoyerPartieInterrompue);
 // ==========================================
 // AVATAR (DiceBear, style "Avataaars" de Pablo Stanley : libre d'usage)
 // ==========================================
-// L'avatar est un petit objet de réglages ; l'image est fabriquée par l'API DiceBear.
+// L'avatar est un petit objet de réglages ; l'image est dessinée sur le téléphone par avatars.js
+// (DiceBear assemblé dans l'app : mêmes images qu'avec l'ancienne API, sans appel extérieur).
 
 const COULEURS_ACCESSOIRES = ["262e33", "65c9ff", "5199e4", "25557c", "e6e6e6", "929598", "3c4f5c", "b1e2ff", "a7ffc4", "ffafb9", "ffffb1", "ff488e", "ff5c5c", "ffffff"];
 const REGLAGES_AVATAR = [
@@ -687,20 +701,21 @@ const REGLAGES_AVATAR = [
 let avatarEnCours = null;
 
 function urlAvatar(a) {
-    const p = new URLSearchParams({
+    const options = {
         seed: "objectif-materiaux",
-        top: a.top, topProbability: 100,
-        hairColor: a.hairColor, facialHairColor: a.hairColor,
-        skinColor: a.skinColor,
-        eyes: a.eyes, eyebrows: a.eyebrows, mouth: a.mouth,
-        clothing: a.clothing, clothesColor: a.clothesColor, clothingGraphic: "diamond",
+        top: [a.top], topProbability: 100,
+        hairColor: [a.hairColor], facialHairColor: [a.hairColor],
+        skinColor: [a.skinColor],
+        eyes: [a.eyes], eyebrows: [a.eyebrows], mouth: [a.mouth],
+        clothing: [a.clothing], clothesColor: [a.clothesColor], clothingGraphic: ["diamond"],
         accessoriesProbability: a.accessories === "aucune" ? 0 : 100,
         facialHairProbability: a.facialHair === "aucune" ? 0 : 100,
-        backgroundColor: a.fond
-    });
-    if (a.accessories !== "aucune") p.set("accessories", a.accessories);
-    if (a.facialHair !== "aucune") p.set("facialHair", a.facialHair);
-    return "https://api.dicebear.com/9.x/avataaars/svg?" + p.toString();
+        backgroundColor: [a.fond]
+    };
+    if (a.accessories !== "aucune") options.accessories = [a.accessories];
+    if (a.facialHair !== "aucune") options.facialHair = [a.facialHair];
+    try { return dessinerAvatar(options); }
+    catch (e) { return ""; } // réglages abîmés (ex. podium) : pas d'image plutôt qu'un écran cassé
 }
 
 function avatarAleatoire() {
